@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ARVYAM — AI‑Curated Floral Experiences</title>
+  <meta name="description" content="Tell us how you feel. Arvyam's AI curates three exquisite, occasion-ready floral experiences.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#FAFAFA',
+            cream: '#F5F0E8',
+            blush: '#EBD8D4',
+            sage: '#A8B9A1',
+            taupe: '#8E7A6A',
+            antique: '#C1A45D'
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['Inter', 'system-ui', 'sans-serif']
+          },
+          letterSpacing: {
+            wider2: '.16em'
+          },
+          boxShadow: {
+            soft: '0 12px 30px rgba(0,0,0,.08)'
+          },
+          borderRadius: {
+            '3xl': '1.5rem'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { background: #FAFAFA; }
+    .card-edge { border: 1px solid rgba(0,0,0,.08); }
+    .hero-bg {
+      background: radial-gradient(1200px 600px at 10% 0%, #f7eee2 0%, #faf3e9 30%, #fafafa 100%);
+    }
+  </style>
+</head>
+<body class="font-body text-neutral-800 selection:bg-blush/40 selection:text-neutral-900">
+  <!-- Header -->
+  <header class="sticky top-0 z-30 backdrop-blur bg-ivory/85 border-b border-neutral-200/60">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="font-display text-2xl md:text-3xl tracking-wider2 uppercase">ARVYAM</a>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#how" class="hover:opacity-70">How it works</a>
+        <a href="#curate" class="hover:opacity-70">Curate</a>
+        <a href="#about" class="hover:opacity-70">About</a>
+      </nav>
+      <a href="#curate" class="inline-flex items-center gap-2 rounded-xl px-4 py-2 border border-amber-300 bg-blush hover:brightness-105 transition">
+        Begin
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero-bg">
+    <div class="max-w-6xl mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
+      <!-- Left: text -->
+      <div>
+        <h1 class="font-display text-4xl md:text-6xl leading-tight text-neutral-900">
+          Tell us how you feel—<br class="hidden md:block">we’ll curate your flowers.
+        </h1>
+        <p class="mt-5 text-lg text-neutral-700 max-w-xl">
+          A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
+        </p>
+        <div class="mt-7 flex items-center gap-3">
+          <a href="#curate" class="rounded-xl px-5 py-3 bg-sage text-white hover:opacity-90 transition shadow-soft">Begin my journey</a>
+          <a href="#how" class="rounded-xl px-5 py-3 border border-neutral-300 hover:bg-cream transition">How it works</a>
+        </div>
+      </div>
+
+      <!-- Right: framed bouquet illustration (inline SVG) -->
+      <figure class="rounded-3xl overflow-hidden bg-white/90 backdrop-blur shadow-soft card-edge p-4">
+        <svg viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fde7ec"/>
+              <stop offset="1" stop-color="#fff5e8"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f4f1ea"/>
+              <stop offset="1" stop-color="#f9f7f2"/>
+            </linearGradient>
+          </defs>
+          <!-- Background panel -->
+          <rect x="0" y="0" width="600" height="480" fill="url(#g2)"/>
+          <!-- Stems -->
+          <g stroke="#8BAA7B" stroke-width="3" fill="none" opacity="0.9">
+            <path d="M280,420 C300,340 300,260 310,200"/>
+            <path d="M300,420 C320,340 340,260 360,210"/>
+            <path d="M260,420 C260,360 250,300 230,240"/>
+            <path d="M320,420 C340,360 360,300 380,250"/>
+          </g>
+          <!-- Leaves -->
+          <g fill="#A8B9A1" opacity="0.9">
+            <ellipse cx="250" cy="290" rx="20" ry="10" transform="rotate(-20 250 290)"/>
+            <ellipse cx="345" cy="300" rx="22" ry="12" transform="rotate(10 345 300)"/>
+            <ellipse cx="220" cy="260" rx="18" ry="9" transform="rotate(-30 220 260)"/>
+            <ellipse cx="380" cy="270" rx="18" ry="10" transform="rotate(20 380 270)"/>
+          </g>
+          <!-- Blooms -->
+          <g>
+            <circle cx="230" cy="210" r="26" fill="#f0c9d2" stroke="#e6b0be" stroke-width="3"/>
+            <circle cx="285" cy="195" r="30" fill="#f5d6dc" stroke="#e6b0be" stroke-width="3"/>
+            <circle cx="340" cy="210" r="24" fill="#f8e0d2" stroke="#e2b78f" stroke-width="3"/>
+            <circle cx="380" cy="235" r="20" fill="#efe3e1" stroke="#d9c4be" stroke-width="3"/>
+            <circle cx="205" cy="235" r="18" fill="#f8d9e0" stroke="#e6b0be" stroke-width="3"/>
+          </g>
+          <!-- Wrap -->
+          <path d="M240,420 L360,420 L330,360 L270,360 Z" fill="url(#g1)" stroke="#ead2c8" stroke-width="2"/>
+          <!-- Ribbon -->
+          <circle cx="300" cy="385" r="10" fill="#e6b17e"/>
+          <path d="M300,385 C295,400 280,410 265,415" stroke="#e6b17e" stroke-width="4" fill="none"/>
+          <path d="M300,385 C305,400 320,410 335,415" stroke="#e6b17e" stroke-width="4" fill="none"/>
+        </svg>
+      </figure>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="py-12 md:py-18 bg-cream/60 border-y border-neutral-200/60">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="font-display text-3xl md:text-4xl">How it works</h2>
+      <div class="mt-8 grid md:grid-cols-3 gap-6">
+        <div class="rounded-2xl bg-white p-6 shadow-soft card-edge">
+          <div class="text-sm tracking-wide text-neutral-500">Step 1</div>
+          <h3 class="font-display text-2xl mt-1">Express yourself</h3>
+          <p class="mt-2 text-neutral-600">Share a feeling, a relationship, or an occasion in your own words.</p>
+        </div>
+        <div class="rounded-2xl bg-white p-6 shadow-soft card-edge">
+          <div class="text-sm tracking-wide text-neutral-500">Step 2</div>
+          <h3 class="font-display text-2xl mt-1">AI, attentively</h3>
+          <p class="mt-2 text-neutral-600">Our AI interprets tone and context to understand the intent behind your words.</p>
+        </div>
+        <div class="rounded-2xl bg-white p-6 shadow-soft card-edge">
+          <div class="text-sm tracking-wide text-neutral-500">Step 3</div>
+          <h3 class="font-display text-2xl mt-1">Curated for the moment</h3>
+          <p class="mt-2 text-neutral-600">Receive three refined floral experiences that match the mood—beautifully presented.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curator -->
+  <section id="curate" class="py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="font-display text-3xl md:text-4xl">What’s on your mind?</h2>
+      <p class="mt-2 text-neutral-600">Type anything — “anniversary dinner”, “tough week”, “a mentor I admire”.</p>
+      <form id="curateForm" class="mt-6 grid sm:grid-cols-[1fr_auto] gap-3" onsubmit="return false">
+        <label class="sr-only" for="prompt">Your words</label>
+        <input id="prompt" name="prompt" type="text" required placeholder="She’s been stressed with work lately"
+               class="rounded-xl border border-neutral-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sage/60">
+        <button id="curateBtn" class="rounded-xl px-5 py-3 bg-sage text-white hover:opacity-90 transition shadow-soft">Curate</button>
+      </form>
+      <div id="results" class="mt-10 grid md:grid-cols-3 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="about" class="py-10 bg-cream/60 border-t border-neutral-200/60">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-6 items-start">
+      <div>
+        <h3 class="font-display text-2xl">A calm, considered experience</h3>
+        <p class="mt-2 text-neutral-600">Arvyam blends thoughtful AI with aesthetic floral design. It’s not a catalog—it’s a quiet conversation that ends with something beautiful.</p>
+      </div>
+      <div class="text-neutral-500 md:text-right">© 2025 Arvyam. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Minimal image-free demo cards (consistent, zero external dependencies)
+    const LIBRARY = [
+      { key: 'love romance heart anniversary date', items: [
+        { name: 'Crimson Classic', flower: 'Red Roses', hue: '#f5e4e4', line: 'Timeless love in deep crimson.' },
+        { name: 'Blush Promise', flower: 'Pink Roses', hue: '#f6e9ee', line: 'Soft affection and gentle warmth.' },
+        { name: 'Moonlit Orchid', flower: 'White Orchid', hue: '#eef0f6', line: 'Elegant devotion, effortlessly.' }
+      ]},
+      { key: 'gratitude thanks appreciation mentor teacher colleague', items: [
+        { name: 'Kindred Bloom', flower: 'Pink Carnations', hue: '#f8e9ef', line: 'A gentle thank you, from the heart.' },
+        { name: 'Sunlit Joy', flower: 'Yellow Gerberas', hue: '#fbf2dc', line: 'Bright gratitude, sunny and sincere.' },
+        { name: 'Graceful Lily', flower: 'White Lily', hue: '#edf2f0', line: 'Pure appreciation, gracefully told.' }
+      ]},
+      { key: 'apology sorry regret forgive make up', items: [
+        { name: 'Quiet Grace', flower: 'White Lily', hue: '#eef3f4', line: 'An earnest apology, softly spoken.' },
+        { name: 'Blue Whisper', flower: 'Hydrangea', hue: '#e9f0f8', line: 'A tender note of understanding.' },
+        { name: 'Ivory Peace', flower: 'White Roses', hue: '#f6f3ef', line: 'An olive branch in bloom.' }
+      ]},
+      { key: 'congrats congratulations promotion achievement success celebration proud', items: [
+        { name: 'Bright Rise', flower: 'Sunflowers', hue: '#fdf3d5', line: 'Big, bold, and brilliantly upbeat.' },
+        { name: 'Confetti Field', flower: 'Gerberas', hue: '#fbe8ee', line: 'A splash of cheer for the win.' },
+        { name: 'Citrus Spark', flower: 'Orange Roses', hue: '#fff0e0', line: 'Vibrant energy, forward momentum.' }
+      ]},
+      { key: 'sympathy loss condolence difficult time', items: [
+        { name: 'White Horizon', flower: 'White Lilies & Mums', hue: '#f2f3f4', line: 'Quiet support, respectfully offered.' },
+        { name: 'Tender Quiet', flower: 'Chrysanthemums', hue: '#f0f1f3', line: 'A gentle presence in hard moments.' },
+        { name: 'Light in Stillness', flower: 'White Roses', hue: '#f6f6f6', line: 'Sincere remembrance, softly held.' }
+      ]},
+      { key: 'encourage support stressed tough week exam courage', items: [
+        { name: 'Daybreak', flower: 'Daisies', hue: '#f7f4e8', line: 'A fresh start in bright petals.' },
+        { name: 'Solar Lift', flower: 'Sunflowers', hue: '#fff4d8', line: 'Head up, heart open.' },
+        { name: 'Pep Talk', flower: 'Orange Roses', hue: '#fff1e9', line: 'Courage, in color.' }
+      ]},
+      { key: 'friend best friend friendship buddy', items: [
+        { name: 'Golden Bond', flower: 'Yellow Roses', hue: '#fff4d6', line: 'For the sunshine they bring.' },
+        { name: 'Bright Company', flower: 'Gerberas', hue: '#fde9f0', line: 'Colorful cheer, shared.' },
+        { name: 'Kind Sparks', flower: 'Alstroemeria', hue: '#f2f2fb', line: 'Little bursts of gratitude.' }
+      ]},
+      { key: 'admire admiration respect inspire mentor leader', items: [
+        { name: 'Poised Orchid', flower: 'Orchid', hue: '#eef0fb', line: 'Refined strength in bloom.' },
+        { name: 'Ivory Lines', flower: 'Calla Lilies', hue: '#f6f6f2', line: 'Quiet excellence, clearly said.' },
+        { name: 'Bold Vista', flower: 'Bird of Paradise', hue: '#fff0df', line: 'A vision that stands apart.' }
+      ]},
+      { key: 'get well recovery hospital feel better', items: [
+        { name: 'Soft Morning', flower: 'Pastel Mix', hue: '#f7f4f2', line: 'Comfort in gentle tones.' },
+        { name: 'Light Steps', flower: 'Tulips', hue: '#f9f7fb', line: 'Small joys, steady and bright.' },
+        { name: 'Fresh Air', flower: 'Daisies', hue: '#f4f8f0', line: 'Breathe in a little hope.' }
+      ]}
+    ];
+
+    function matchItems(text) {
+      const t = (text || '').toLowerCase();
+      for (const group of LIBRARY) {
+        const keys = group.key.split(' ');
+        if (keys.some(k => t.includes(k))) return group.items;
+      }
+      return [
+        { name: 'Garden Muse', flower: 'Mixed Pastels', hue: '#f7f3f6', line: 'Softly spoken, beautifully felt.' },
+        { name: 'Sun-kissed', flower: 'Gerberas & Roses', hue: '#fff0e8', line: 'A friendly burst of color.' },
+        { name: 'Poise', flower: 'Orchid & Lily', hue: '#eef2f6', line: 'Minimal, elegant, assured.' }
+      ];
+    }
+
+    function render(items) {
+      const root = document.getElementById('results');
+      root.innerHTML = items.map(x => `
+        <article class="rounded-2xl bg-white shadow-soft overflow-hidden text-left border border-neutral-200">
+          <div class="aspect-[4/3] w-full" style="background:${x.hue}">
+            <div class="w-full h-full grid place-items-center text-neutral-600">
+              <div class="text-center p-6">
+                <div class="font-display text-xl">${x.name}</div>
+                <div class="mt-1 text-sm tracking-wide uppercase text-neutral-500">${x.flower}</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-5">
+            <p class="text-neutral-600 mt-1">${x.line}</p>
+            <div class="mt-4 flex items-center justify-between">
+              <span class="inline-flex items-center rounded-lg bg-cream px-3 py-1 text-sm">${x.flower}</span>
+              <button class="rounded-xl px-4 py-2 border border-neutral-300 hover:bg-cream transition">View</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('curateBtn');
+      btn.addEventListener('click', () => {
+        const val = document.getElementById('prompt').value;
+        const items = matchItems(val);
+        render(items);
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
