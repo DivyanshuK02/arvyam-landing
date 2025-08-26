@@ -6,7 +6,6 @@
   <title>ARVYAM — AI‑Curated Floral Experiences</title>
   <meta name="description" content="Tell us how you feel. Arvyam's AI curates three exquisite, occasion-ready floral experiences." />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
@@ -34,7 +33,7 @@
     button,input{font:inherit}
 
     /* Headlines (Playfair) */
-    h1,h2,h3,.wordmark,.ghost,.curate-label{
+    h1,h2,h3,h4,.wordmark,.ghost,.curate-label{
       font-family:"Playfair Display",Georgia,serif;
       font-weight:500;
       letter-spacing:-0.012em;
@@ -46,7 +45,7 @@
     .wordmark{text-transform:uppercase; letter-spacing:.18em; font-size:28px; font-weight:600}
 
     /* Body (Lora) */
-    body,p,a,button,input,small,li,.lead,.hint{
+    body,p,a,button,input,small,li,.lead,.hint,.card-description{
       font-family:"Lora",Georgia,serif;
       font-weight:400; line-height:1.65; letter-spacing:0;
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
@@ -115,24 +114,44 @@
     .tile h3{font-weight:600; font-size:22px; margin-top:10px}
     .tile p{font-size:15px; color:var(--muted); margin-top:8px}
 
-    .grid{display:grid; grid-template-columns:1fr; gap:26px; margin-top:30px}
+    .grid{
+        display: none; /* The key change: hide by default */
+        grid-template-columns:1fr;
+        gap:26px;
+        margin-top:30px;
+        text-align:center;
+    }
     @media(min-width:960px){ .grid{grid-template-columns:repeat(3,1fr)} }
     .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
     .card .pad{padding:18px; text-align:center}
     .card h4{font-weight:600; font-size:20px; margin:8px 0 12px}
-    .ghost{background:#fff; border-radius:12px; padding:12px 20px; font-weight:600; font-size:16px; display:inline-block; font-family:"Playfair Display",Georgia,serif;}
+    .card-description {
+      font-family: 'Lora', serif;
+      font-size: 16px;
+      color: var(--ink);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .ghost{
+      background:#fff;
+      border-radius:12px;
+      padding:12px 20px;
+      font-weight:600;
+      font-size:16px;
+      display:inline-block;
+      font-family:"Playfair Display",Georgia,serif;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <div class="container bar">
       <div class="wordmark">ARVYAM</div>
     </div>
   </header>
 
-  <!-- HERO -->
   <section class="container" style="padding-block:96px">
     <div class="row">
       <div>
@@ -151,44 +170,21 @@
     </div>
   </section>
 
-  <!-- CURATED -->
   <section id="curate" class="container" style="padding-block:84px">
     <h2>Curated Just for You</h2>
     <div class="curate-card">
       <div class="curate-label">What’s on your mind?</div>
-      <form class="form-grid" onsubmit="return false">
-        <input class="input" placeholder="Write a feeling or occasion in a single line…" aria-label="Your message">
-        <button class="btn primary" aria-label="Curate suggestions">Curate</button>
+      <form id="curate-form" class="form-grid">
+        <input id="feelings-input" class="input" placeholder="Write a feeling or occasion in a single line…" aria-label="Your message">
+        <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
       </form>
       <div class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
     </div>
 
-    <div class="grid">
-      <article class="card">
-        <img src="assets/card-1.jpg" alt="Bouquet for encouragement">
-        <div class="pad">
-          <h4>For encouragement</h4>
-          <a class="ghost" href="#">View Details</a>
-        </div>
-      </article>
-      <article class="card">
-        <img src="assets/card-2.jpg" alt="Bouquet for lasting love">
-        <div class="pad">
-          <h4>For lasting love</h4>
-          <a class="ghost" href="#">View Details</a>
-        </div>
-      </article>
-      <article class="card">
-        <img src="assets/card-3.jpg" alt="Bouquet for gratitude">
-        <div class="pad">
-          <h4>For gratitude</h4>
-          <a class="ghost" href="#">View Details</a>
-        </div>
-      </article>
-    </div>
+    <div id="curated-results" class="grid">
+      </div>
   </section>
 
-  <!-- HOW IT WORKS -->
   <section id="how" class="container" style="padding-block:112px; text-align:center">
     <h2>How it works</h2>
     <div class="tiles">
@@ -213,6 +209,65 @@
 
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
+
+    // New JavaScript for the Curate form
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('curate-form');
+      const resultsContainer = document.getElementById('curated-results');
+      const feelingsInput = document.getElementById('feelings-input');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault(); // This is crucial. It stops the page from reloading.
+
+        const userInput = feelingsInput.value;
+        if (userInput.trim() === '') {
+          return;
+        }
+
+        // Simulate a "loading" state
+        resultsContainer.innerHTML = '<p style="text-align: center; font-family: Lora, serif; color: #2B2B2B;">Curating your bouquets...</p>';
+        resultsContainer.style.display = 'grid'; // Ensure the container is visible
+
+        setTimeout(() => {
+          const mockBouquets = [
+            {
+              title: "The Encouragement Bouquet",
+              image: "assets/card-1.jpg",
+              description: "A thoughtful mix of bright yellow sunflowers and white lilies, symbolizing hope and light. Perfect for lifting spirits and showing your support.",
+              cta: "View Details",
+            },
+            {
+              title: "Lasting Love Bouquet",
+              image: "assets/card-2.jpg",
+              description: "Classic red roses and delicate baby's breath, a timeless expression of deep affection and enduring romance. For the moments that truly matter.",
+              cta: "View Details",
+            },
+            {
+              title: "The Gratitude Bouquet",
+              image: "assets/card-3.jpg",
+              description: "A soft arrangement of peach-colored roses and eucalyptus, conveying sincere appreciation and warmth. A beautiful way to say thank you.",
+              cta: "View Details",
+            },
+          ];
+
+          resultsContainer.innerHTML = '';
+          mockBouquets.forEach(bouquet => {
+            const cardHTML = `
+              <article class="card">
+                <img src="${bouquet.image}" alt="${bouquet.title}">
+                <div class="pad">
+                  <h4>${bouquet.title}</h4>
+                  <p class="card-description">${bouquet.description}</p>
+                  <a class="ghost" href="#">${bouquet.cta}</a>
+                </div>
+              </article>
+            `;
+            resultsContainer.innerHTML += cardHTML;
+          });
+        }, 1000); // Wait 1 second to simulate a network call
+      });
+    });
   </script>
+
 </body>
 </html>
