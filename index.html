@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARVYAM — AI‑Curated Floral Experiences</title>
+  <meta name="description" content="Tell us how you feel. Arvyam's AI curates three exquisite, occasion-ready floral experiences." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#FCF6EE; --ink:#2B2B2B; --muted:#6F6A62; --panel:#FFFFFF;
+      --accent:#E6B17E; --accent-ink:#1e1e1e;
+      --shadow:0 12px 30px rgba(0,0,0,.06);
+
+      --radius:16px; --radius-photo:20px; --radius-ctl:14px;
+      --ctl-h:60px; --container:1160px;
+
+      --h1:clamp(38px,5.2vw,60px);
+      --h2:clamp(28px,3.4vw,38px);
+      --section-pad:96px; --header-offset:96px;
+    }
+
+    /* Reset & base */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+    html{scroll-behavior:smooth}
+    img{display:block;max-width:100%;height:auto}
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+
+    /* Headlines (Playfair) */
+    h1,h2,h3,h4,.wordmark,.ghost,.curate-label{
+      font-family:"Playfair Display",Georgia,serif;
+      font-weight:500;
+      letter-spacing:-0.012em;
+      margin:0; color:var(--ink);
+    }
+    h1{font-size:var(--h1); line-height:1.15}
+    h2{font-size:var(--h2); text-align:center; line-height:1.2}
+
+    .wordmark{text-transform:uppercase; letter-spacing:.18em; font-size:28px; font-weight:600}
+
+    /* Body (Lora) */
+    body,p,a,button,input,small,li,.lead,.hint,.card-description{
+      font-family:"Lora",Georgia,serif;
+      font-weight:400; line-height:1.65; letter-spacing:0;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      color:var(--ink);
+    }
+    .muted{color:var(--muted)}
+
+    /* Layout */
+    .container{max-width:var(--container); margin:0 auto; padding:0 16px}
+    section{padding-block:var(--section-pad)}
+    #curate, #how{scroll-margin-top:var(--header-offset)}
+    .row{display:grid; grid-template-columns:1fr; gap:44px}
+    @media(min-width:960px){ .row{grid-template-columns:1.06fr .94fr; align-items:center} }
+
+    /* Header */
+    header{position:sticky; top:0; z-index:10;
+      background:rgba(252,246,238,.9); backdrop-filter:blur(8px);
+    }
+    .bar{display:flex; align-items:center; justify-content:flex-start; gap:18px; padding:16px}
+
+    /* Buttons */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:var(--ctl-h); padding:0 24px; border-radius:var(--radius-ctl);
+      border:1px solid rgba(0,0,0,.05); background:#fff; cursor:pointer;
+      box-shadow:0 2px 0 rgba(0,0,0,.06) inset, 0 1px 2px rgba(0,0,0,.04);
+      transition:transform .05s ease, filter .15s ease;
+      font-family:"Lora",Georgia,serif;
+      font-weight:600; font-size:17px;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:var(--accent); color:var(--accent-ink)}
+
+    /* Photo frame - taller hero */
+    .frame{background:#fff; border-radius:var(--radius-photo); overflow:hidden; box-shadow:var(--shadow)}
+    .frame img{width:100%; height:100%; object-fit:cover; object-position:center}
+    @media(min-width:960px){ .frame{aspect-ratio:4/5} }
+
+    /* Lead text */
+    .lead{font-size:18px; line-height:1.6; max-width:640px; font-weight:400}
+
+    /* Curate card */
+    .curate-card{
+      background:rgba(255,255,255,.9);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:34px 26px;
+      max-width:880px;
+      margin:28px auto 0;
+      text-align:center;
+    }
+    .curate-label{font-size:22px; margin-bottom:12px; font-weight:600}
+    .form-grid{display:grid; grid-template-columns:1fr; gap:12px}
+    @media(min-width:760px){ .form-grid{grid-template-columns:1fr auto} }
+    .input{
+      height:var(--ctl-h); padding:0 18px; border-radius:var(--radius-ctl);
+      border:1px solid rgba(0,0,0,0.08); background:#fff; font-size:17px;
+      box-shadow:0 1px 0 rgba(0,0,0,.05) inset;
+    }
+    .hint{font-size:14px; color:#7a746c; margin-top:14px}
+
+    /* Tiles & cards */
+    .tiles{display:grid; grid-template-columns:1fr; gap:26px; margin-top:40px}
+    @media(min-width:960px){ .tiles{grid-template-columns:repeat(3,1fr)} }
+    .tile{background:#F2F5EF; border-radius:16px; padding:28px; text-align:center; box-shadow:var(--shadow)}
+    .tile h3{font-weight:600; font-size:22px; margin-top:10px}
+    .tile p{font-size:15px; color:var(--muted); margin-top:8px}
+
+    .grid{
+        display: none; /* The key change: hide by default */
+        grid-template-columns:1fr;
+        gap:26px;
+        margin-top:30px;
+        text-align:center;
+    }
+    @media(min-width:960px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
+    .card .pad{padding:18px; text-align:center}
+    .card h4{font-weight:600; font-size:20px; margin:8px 0 12px}
+    .card-description {
+      font-family: 'Lora', serif;
+      font-size: 16px;
+      color: var(--ink);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .ghost{
+      background:#fff;
+      border-radius:12px;
+      padding:12px 20px;
+      font-weight:600;
+      font-size:16px;
+      display:inline-block;
+      font-family:"Playfair Display",Georgia,serif;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container bar">
+      <div class="wordmark">ARVYAM</div>
+    </div>
+  </header>
+
+  <section class="container" style="padding-block:96px">
+    <div class="row">
+      <div>
+        <h1>Tell us how you feel—<br>we’ll curate your flowers.</h1>
+        <p class="lead muted" style="margin-top:20px">
+          A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
+        </p>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:28px">
+          <a class="btn primary" href="#curate">Begin my journey</a>
+          <a class="btn" href="#how">How it works</a>
+        </div>
+      </div>
+      <figure class="frame">
+        <img src="assets/hero.png" alt="White bouquet in a minimal white vase, soft editorial backdrop" />
+      </figure>
+    </div>
+  </section>
+
+  <section id="curate" class="container" style="padding-block:84px">
+    <h2>Curated Just for You</h2>
+    <div class="curate-card">
+      <div class="curate-label">What’s on your mind?</div>
+      <form id="curate-form" class="form-grid">
+        <input id="feelings-input" class="input" placeholder="Write a feeling or occasion in a single line…" aria-label="Your message">
+        <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
+      </form>
+      <div class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
+    </div>
+
+    <div id="curated-results" class="grid">
+      </div>
+  </section>
+
+  <section id="how" class="container" style="padding-block:112px; text-align:center">
+    <h2>How it works</h2>
+    <div class="tiles">
+      <div class="tile">
+        <h3>Express yourself</h3>
+        <p>Write a thought, feeling, or occasion.</p>
+      </div>
+      <div class="tile">
+        <h3>AI curates</h3>
+        <p>We interpret tone & context to understand your intent.</p>
+      </div>
+      <div class="tile">
+        <h3>Your experience</h3>
+        <p>Three refined options that match the mood, beautifully presented.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer style="padding:56px 16px; text-align:center; color:var(--muted)">
+    © <span id="y"></span> ARVYAM — quietly delightful flowers.
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // New JavaScript for the Curate form
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('curate-form');
+      const resultsContainer = document.getElementById('curated-results');
+      const feelingsInput = document.getElementById('feelings-input');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault(); // This is crucial. It stops the page from reloading.
+
+        const userInput = feelingsInput.value;
+        if (userInput.trim() === '') {
+          return;
+        }
+
+        // Simulate a "loading" state
+        resultsContainer.innerHTML = '<p style="text-align: center; font-family: Lora, serif; color: #2B2B2B;">Curating your bouquets...</p>';
+        resultsContainer.style.display = 'grid'; // Ensure the container is visible
+
+        fetch('https://arvyam-api.onrender.com/api/curate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ prompt: userInput }),
+})
+.then(async (res) => {
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    const msg = data?.error?.message || 'Could not curate right now.';
+    throw new Error(msg);
+  }
+  return res.json();
+})
+.then((items) => {
+  resultsContainer.innerHTML = '';
+  resultsContainer.style.display = 'grid';
+  items.forEach((it) => {
+    const cardHTML = `
+      <article class="card">
+        <img src="${it.image}" alt="${it.title}">
+        <div class="pad">
+          <h4>${it.title}</h4>
+          <p class="card-description">${it.desc}</p>
+          <div class="ghost">₹${it.price} ${it.currency}</div>
+        </div>
+      </article>`;
+    resultsContainer.innerHTML += cardHTML;
+  });
+})
+.catch((err) => {
+  resultsContainer.innerHTML =
+    `<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">${err.message}</p>`;
+});// Wait 1 second to simulate a network call
+      });
+    });
+  </script>
+
+</body>
+</html>
