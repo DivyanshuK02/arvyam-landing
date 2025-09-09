@@ -270,17 +270,17 @@
           fieldError.style.display = 'none';
         }
 
-        // Loading state (centered with calm fade dots)
+        // Loading state (true centered with calm fade dots)
         resultsContainer.innerHTML = `
-          <div style="text-align:center;">
-            <p style="font-family:Lora,serif;color:#2B2B2B;">
+          <div style="display:flex;justify-content:center;align-items:center;width:100%;">
+            <p style="font-family:Lora,serif;color:#2B2B2B;margin:0;">
               ARVY is curating<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
             </p>
           </div>
         `;
         resultsContainer.style.display = 'grid';
 
-        console.log(`[${PERSONA}] curate-submit`);
+        console.log(\`[\${PERSONA}] curate-submit\`);
 
         fetch('https://arvyam-api.onrender.com/api/curate', {
           method: 'POST',
@@ -333,7 +333,7 @@
         .catch((err) => {
           resultsContainer.innerHTML =
             `<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">${err.message}</p>`;
-          console.warn(`[${PERSONA}] curate-error:`, err?.message);
+          console.warn(\`[\${PERSONA}] curate-error:\`, err?.message);
         });
       });
     });
@@ -341,4 +341,3 @@
 
 </body>
 </html>
-
