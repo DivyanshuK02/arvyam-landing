@@ -76,7 +76,6 @@
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{background:var(--accent); color:var(--accent-ink)}
-    .btn[disabled]{opacity:.6; cursor:not-allowed}
 
     /* Photo frame - taller hero */
     .frame{background:#fff; border-radius:var(--radius-photo); overflow:hidden; box-shadow:var(--shadow)}
@@ -137,31 +136,6 @@
     }
     .buy-btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,0.10); background:#222; }
     .buy-btn:active{ transform: translateY(0); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-
-    /* A11y helper (visually hidden) */
-    .sr-only {
-      position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
-      overflow:hidden; clip:rect(0,0,1,1); white-space:nowrap; border:0;
-    }
-
-    /* Calm fade dots for loading */
-    .dot {
-      opacity: 0;
-      animation: fadeDots 1.2s ease-in-out infinite;
-      display:inline-block;
-      width: .25em;
-      text-align: left;
-    }
-    .dot:nth-of-type(1) { animation-delay: 0s; }
-    .dot:nth-of-type(2) { animation-delay: .25s; }
-    .dot:nth-of-type(3) { animation-delay: .5s; }
-
-    @keyframes fadeDots {
-      0%   { opacity: 0; }
-      30%  { opacity: 1; }
-      60%  { opacity: 0; }
-      100% { opacity: 0; }
-    }
   </style>
 </head>
 <body>
@@ -198,14 +172,12 @@
     </div>
 
     <div class="curate-card">
-      <!-- Visually hidden label for accessibility -->
-      <label for="feelings-input" class="sr-only">Your message</label>
-
-      <form id="curate-form" class="form-grid" novalidate>
+      <form id="curate-form" class="form-grid">
         <input id="feelings-input" class="input"
                placeholder="Write a feeling or occasion…"
-               aria-label="Your message" required>
-        <button id="curate-btn" type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
+               aria-label="Your message"
+               required>
+        <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
       </form>
 
       <!-- Inline validation area (hidden until needed) -->
@@ -214,7 +186,7 @@
       <div class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
     </div>
 
-    <div id="curated-results" class="grid" aria-live="polite"></div>
+    <div id="curated-results" class="grid"></div>
   </section>
 
   <section id="how" class="container" style="padding-block:112px; text-align:center">
@@ -240,66 +212,28 @@
   </footer>
 
   <script>
-    // Year stamp
+    // Footer year
     document.getElementById('y').textContent = new Date().getFullYear();
 
     document.addEventListener('DOMContentLoaded', () => {
       const PERSONA = 'ARVY';
       const form = document.getElementById('curate-form');
-      const curateBtn = document.getElementById('curate-btn');
-      const results = document.getElementById('curated-results');
-      const input = document.getElementById('feelings-input');
+      const resultsContainer = document.getElementById('curated-results');
+      const feelingsInput = document.getElementById('feelings-input');
       const fieldError = document.getElementById('field-error');
 
-      function showCentered(html) {
-        results.innerHTML = `
-          <div style="display:flex;justify-content:center;align-items:center;width:100%;">
-            ${html}
-          </div>`;
-        results.style.display = 'grid';
-      }
+      form.addEventListener('submit', (event) => {
+        event.preventDefault(); // prevent reload
 
-      function showError(msg) {
-        showCentered(
-          `<p style="font-family:Lora,serif;color:#2B2B2B;margin:0;text-align:center;">${msg}</p>`
-        );
-        console.warn(\`[\${PERSONA}] curate-error:\`, msg);
-      }
-
-      async function postJSON(url, payload, timeoutMs = 12000) {
-        const ctl = new AbortController();
-        const t = setTimeout(() => ctl.abort(), timeoutMs);
-        try {
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: ctl.signal
-          });
-          let data = null;
-          try { data = await res.json(); } catch { /* ignore parse error */ }
-          if (!res.ok) {
-            const apiMsg = data?.error?.message ? ' — ' + data.error.message : '';
-            throw new Error(\`\${res.status} \${res.statusText}\${apiMsg}\`);
-          }
-          return data;
-        } finally {
-          clearTimeout(t);
-        }
-      }
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const text = input.value;
+        const userInput = feelingsInput.value;
 
         // Soft validation (Option B)
-        if (text.trim() === '') {
+        if (userInput.trim() === '') {
           fieldError.textContent = 'Please write a short line.';
           fieldError.style.display = 'block';
           return;
         }
-        if (text.length > 240) {
+        if (userInput.length > 240) {
           fieldError.textContent = 'Please shorten to under 240 characters.';
           fieldError.style.display = 'block';
           return;
@@ -307,73 +241,73 @@
         fieldError.textContent = '';
         fieldError.style.display = 'none';
 
-        // Disable to prevent duplicates
-        curateBtn.disabled = true;
+        // Centered loading message (no animation)
+        resultsContainer.innerHTML = `
+          <div style="display:flex;justify-content:center;align-items:center;width:100%;">
+            <p style="font-family:Lora,serif;color:#2B2B2B;margin:0;">ARVY is curating…</p>
+          </div>
+        `;
+        resultsContainer.style.display = 'grid'; // ensure visible
 
-        // Centered loader with calm dots
-        showCentered(`
-          <p style="font-family:Lora,serif;color:#2B2B2B;margin:0;">
-            ARVY is curating<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
-          </p>
-        `);
-
-        try {
-          const items = await postJSON('https://arvyam-api.onrender.com/api/curate', { prompt: text });
-
-          if (!Array.isArray(items) || items.length === 0) {
-            showError('No options available right now.');
-            return;
+        // Original fetch pattern preserved
+        fetch('https://arvyam-api.onrender.com/api/curate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: userInput }),
+        })
+        .then(async (res) => {
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            const msg = data?.error?.message || 'Could not curate right now.';
+            throw new Error(msg);
           }
-
-          // Render items
-          results.innerHTML = '';
-          results.style.display = 'grid';
+          return res.json();
+        })
+        .then((items) => {
+          resultsContainer.innerHTML = ''; // clear loader
+          resultsContainer.style.display = 'grid';
 
           items.forEach((it) => {
-            const title = (it && it.title) ? it.title : 'Curated Option';
-            const desc  = (it && it.desc)  ? it.desc  : '';
-            const img   = (it && it.image) ? it.image : 'assets/placeholder.png';
-            const price = (it && it.price != null) ? it.price : '';
-            const curr  = (it && it.currency) ? it.currency : '';
-            const pid   = (it && it.id) ? it.id : '';
-
-            const card = `
+            const cardHTML = `
               <article class="card">
-                <img src="${img}" alt="${title}">
+                <img src="${it.image}" alt="${it.title}">
                 <div class="pad">
-                  <h4>${title}</h4>
-                  <p class="card-description">${desc}</p>
-                  <div class="ghost">${price !== '' ? '₹' + price + (curr ? ' ' + curr : '') : ''}</div>
-                  <button class="buy-btn" data-product-id="${pid}" ${pid ? '' : 'disabled'}>${pid ? 'Buy' : 'Unavailable'}</button>
+                  <h4>${it.title}</h4>
+                  <p class="card-description">${it.desc}</p>
+                  <div class="ghost">₹${it.price} ${it.currency}</div>
+                  <button class="buy-btn" data-product-id="${it.id}">Buy</button>
                 </div>
               </article>`;
-            results.insertAdjacentHTML('beforeend', card);
+            resultsContainer.innerHTML += cardHTML;
           });
 
-          // Hook up checkout buttons
-          results.querySelectorAll('.buy-btn').forEach((btn) => {
-            btn.addEventListener('click', async (ev) => {
-              const pid = ev.currentTarget.getAttribute('data-product-id');
-              if (!pid) return;
+          // Checkout handlers
+          resultsContainer.querySelectorAll('.buy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const pid = e.currentTarget.getAttribute('data-product-id');
               try {
-                const data = await postJSON('https://arvyam-api.onrender.com/api/checkout', { product_id: pid }, 12000);
-                if (!data?.checkout_url) throw new Error('Checkout not available.');
+                const r = await fetch('https://arvyam-api.onrender.com/api/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ product_id: pid })
+                });
+                const data = await r.json().catch(() => ({}));
+                if (!r.ok || !data?.checkout_url) throw new Error('Checkout not available.');
                 window.location.href = data.checkout_url;
               } catch (err) {
                 alert(err.message || 'Could not start checkout.');
               }
             });
           });
-
-        } catch (err) {
-          showError(err?.message || 'Could not curate right now.');
-        } finally {
-          curateBtn.disabled = false;
-        }
+        })
+        .catch((err) => {
+          resultsContainer.innerHTML =
+            `<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">${err.message}</p>`;
+          console.warn(\`[\${PERSONA}] curate-error:\`, err?.message);
+        });
       });
     });
   </script>
 
 </body>
 </html>
-
