@@ -253,12 +253,13 @@
 
         // Loading state (centered with JS dot animation)
         resultsContainer.innerHTML = `
-          <div style="text-align:center;">
-            <p id="loading-msg" style="font-family:Lora,serif;color:#2B2B2B;">
-              ARVY is curating<span id="dots"></span>
-            </p>
-          </div>
-        `;
+  <div style="display:flex;justify-content:center;align-items:center;width:100%;">
+    <p id="loading-msg" style="font-family:Lora,serif;color:#2B2B2B;margin:0;">
+      ARVY is curating<span id="dots"></span>
+    </p>
+  </div>
+`;
+
         resultsContainer.style.display = 'grid';
 
         // Animate dots
