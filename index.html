@@ -1,4 +1,4 @@
-    <!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -97,7 +97,6 @@
       margin:28px auto 0;
       text-align:center;
     }
-    .curate-label{font-size:22px; margin-bottom:12px; font-weight:600}
     .form-grid{display:grid; grid-template-columns:1fr; gap:12px}
     @media(min-width:760px){ .form-grid{grid-template-columns:1fr auto} }
     .input{
@@ -138,6 +137,22 @@
     }
     .buy-btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,0.10); background:#222; }
     .buy-btn:active{ transform: translateY(0); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+
+    /* A11y helper (visually hidden) */
+    .sr-only {
+      position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0,0,1,1); white-space:nowrap; border:0;
+    }
+
+    /* Loading message */
+    .loading { text-align:center; }
+    .loading .dots::after {
+      content:""; display:inline-block; width:1.2em; text-align:left;
+      animation: ellipsis 1.25s steps(4,end) infinite;
+    }
+    @keyframes ellipsis {
+      0%{content:""} 25%{content:"."} 50%{content:".."} 75%{content:"..."} 100%{content:""}
+    }
   </style>
 </head>
 <body>
@@ -145,7 +160,7 @@
   <header>
     <div class="container bar">
       <div class="wordmark">ARVYAM</div>
-      <!-- tagline removed by design -->
+      <!-- tagline intentionally removed -->
     </div>
   </header>
 
@@ -169,22 +184,23 @@
 
   <section id="curate" class="container" style="padding-block:84px">
     <h2>Curated Just for You</h2>
-    <!-- subtle subline -->
     <div class="muted" style="text-align:center; margin-top:6px; font-size:15px;">
       by ARVY — your meaning engine
     </div>
 
     <div class="curate-card">
-      <div class="curate-label">What’s on your mind?</div>
+      <!-- Visually hidden label for accessibility -->
+      <label for="feelings-input" class="sr-only">Your message</label>
 
       <form id="curate-form" class="form-grid">
         <input id="feelings-input" class="input"
                placeholder="Write a feeling or occasion…"
                aria-label="Your message"
-               maxlength="240" required>
+               required>
         <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
       </form>
-      <!-- inline validation area (hidden until needed) -->
+
+      <!-- Inline validation area (hidden until needed) -->
       <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
 
       <div class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
@@ -229,12 +245,13 @@
         event.preventDefault();
 
         const userInput = feelingsInput.value;
+
+        // Soft validation
         if (userInput.trim() === '') {
           fieldError.textContent = 'Please write a short line.';
           fieldError.style.display = 'block';
           return;
         }
-
         if (userInput.length > 240) {
           fieldError.textContent = 'Please shorten to under 240 characters.';
           fieldError.style.display = 'block';
@@ -244,8 +261,9 @@
           fieldError.style.display = 'none';
         }
 
-        // Loading state
-        resultsContainer.innerHTML = '<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">Curating your bouquets…</p>';
+        // Loading state (centered, subtle animation)
+        resultsContainer.innerHTML =
+          '<p class="loading" style="font-family:Lora,serif;color:#2B2B2B;">ARVY is curating<span class="dots"></span></p>';
         resultsContainer.style.display = 'grid';
 
         console.log(`[${PERSONA}] curate-submit`);
@@ -299,7 +317,8 @@
           });
         })
         .catch((err) => {
-          resultsContainer.innerHTML = `<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">${err.message}</p>`;
+          resultsContainer.innerHTML =
+            `<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">${err.message}</p>`;
           console.warn(`[${PERSONA}] curate-error:`, err?.message);
         });
       });
