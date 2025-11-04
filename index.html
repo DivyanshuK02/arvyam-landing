@@ -78,11 +78,19 @@
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{background:var(--accent); color:var(--accent-ink)}
+    /* Keyboard focus visibility (a11y) */
+    .btn:focus-visible, .input:focus-visible { outline: 3px solid #6EA7FF; outline-offset: 3px; }
 
     /* Photo frame - taller hero */
     .frame{background:#fff; border-radius:var(--radius-photo); overflow:hidden; box-shadow:var(--shadow)}
     .frame img{width:100%; height:100%; object-fit:cover; object-position:center}
     @media(min-width:960px){ .frame{aspect-ratio:4/5} }
+
+    /* --- Hero video feature flag (1-click rollback) --- */#hero-frame .hero-video { display:none; width:100%; height:100%; object-fit:cover; }#hero-frame .hero-poster { display:block; width:100%; height:100%; object-fit:cover; }/* When the figure has .video-active, show video, hide poster */#hero-frame.video-active .hero-video { display:block; }#hero-frame.video-active .hero-poster { display:none; }/* Respect users who prefer reduced motion */@media (prefers-reduced-motion: reduce) {
+      #hero-frame.video-active .hero-video { display:none; }
+      #hero-frame .hero-poster { display:block; }
+      html { scroll-behavior:auto; } /* disable smooth scroll for a11y */
+    }
 
     /* Lead text */
     .lead{font-size:18px; line-height:1.6; max-width:640px; font-weight:400}
@@ -123,6 +131,12 @@
     @media(min-width:960px){ .grid{grid-template-columns:repeat(3,1fr)} }
     .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
     .card .pad{padding:18px; text-align:center}
+    /* Avoid CLS on card images */
+    .card img{ aspect-ratio:4/3; width:100%; height:auto; object-fit:cover }
+    /* Cards: gentle fade-in on render (CSS-only). Respects reduced motion. */
+    @keyframes cardFade { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+    .card{ animation: cardFade .5s ease-out forwards; opacity:0; }
+    @media (prefers-reduced-motion: reduce){ .card{ animation:none; opacity:1; } }
     .card h4{font-weight:600; font-size:20px; margin:8px 0 12px}
     .card-description{font-family:'Lora',serif; font-size:16px; color:var(--ink); margin-top:8px; line-height:1.6}
     .ghost{
@@ -143,6 +157,9 @@
       position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
       overflow:hidden; clip:rect(0,0,1,1); white-space:nowrap; border:0;
     }
+@media (max-width: 480px){
+  .buy-btn{ min-height:44px; }
+}
   </style>
 </head>
 <body>
@@ -150,8 +167,7 @@
   <header>
     <div class="container bar">
       <div class="wordmark">ARVYAM</div>
-      <!-- tagline intentionally removed -->
-    </div>
+      </div>
   </header>
 
   <section class="container" style="padding-block:96px">
@@ -162,13 +178,26 @@
           A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
         </p>
         <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:28px">
-          <a class="btn primary" href="#curate">Begin my journey</a>
-          <a class="btn" href="#how">How it works</a>
+          <a class="btn primary" href="#curate" aria-label="Start your curated gift">Begin my journey</a>
+          <a class="btn" href="#how" aria-label="Learn how Arvyam works">How it works</a>
         </div>
       </div>
-      <figure class="frame">
-        <img src="assets/hero.png" alt="White bouquet in a minimal white vase, soft editorial backdrop" />
-      </figure>
+      <figure class="frame" id="hero-frame">
+        <img class="hero-poster" src="assets/hero-poster.jpg"
+             fetchpriority="high" decoding="async"
+             alt="Soft, editorial bouquet — calm, minimal, cream background." />
+
+        <video id="hero-video" class="hero-video" aria-describedby="hero-caption"
+               poster="assets/hero-poster.jpg"
+               preload="none" muted playsinline loop aria-label="Calm editorial hero video">
+          <source src="assets/hero-loop.mp4" type="video/mp4" />
+        </video>
+
+        <figcaption id="hero-caption" class="sr-only">Ambient hero: a calm bouquet with subtle blueprint lines—silent motion suggesting AI craftsmanship.</figcaption>
+        <noscript>
+          <img src="assets/hero-poster.jpg"
+               alt="Soft, editorial bouquet — calm, minimal, cream background.">
+        </noscript></figure>
     </div>
   </section>
 
@@ -179,21 +208,19 @@
     </div>
 
     <div class="curate-card">
-      <!-- Visually hidden label for accessibility -->
       <label for="feelings-input" class="sr-only">Your message</label>
 
       <form id="curate-form" class="form-grid">
-        <input id="feelings-input" class="input"
+        <input id="feelings-input" class="input" name="message"
                placeholder="Write a feeling or occasion…"
-               aria-label="Your message"
-               required>
+               aria-describedby="field-error hint"
+               maxlength="240" required>
         <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
       </form>
 
-      <!-- Inline validation area (hidden until needed) -->
       <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
 
-      <div class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
+      <div id="hint" class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
     </div>
 
     <div id="curated-results" class="grid"></div>
@@ -218,7 +245,10 @@
   </section>
 
   <footer style="padding:56px 16px; text-align:center; color:var(--muted)">
-    © <span id="y"></span> ARVYAM — quietly delightful flowers.
+    © <span id="y"></span> ARVYAM — quietly delightful flowers. ·
+    <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> ·
+    <a href="/refund">Refund</a> · <a href="/delivery">Delivery</a> ·
+    <a href="/contact">Contact</a>
   </footer>
 
   <script>
@@ -230,6 +260,43 @@
       const resultsContainer = document.getElementById('curated-results');
       const feelingsInput = document.getElementById('feelings-input');
       const fieldError = document.getElementById('field-error');
+
+      // --- PATCH C: HERO VIDEO LOGIC ---
+      const frame = document.getElementById('hero-frame');
+      const vid   = document.getElementById('hero-video');
+
+      // Honor accessibility: if reduced motion, keep poster
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (frame) frame.classList.remove('video-active');
+        // poster stays as LCP + final state
+      } else if (frame && vid) {
+        // Lazy-prepare the video after page is settled
+        const enableVideo = () => {
+          if (!frame) return;
+          frame.classList.add('video-active');   // flip feature ON
+          vid.preload = 'auto';
+
+          const tryPlay = vid.play();
+          if (tryPlay && typeof tryPlay.then === 'function') {
+            tryPlay.catch(() => {
+              // Autoplay blocked or error — quietly rollback to poster
+              frame.classList.remove('video-active');
+            });
+          }
+        };
+
+        // Idle trigger (safe on all browsers)
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(enableVideo, { timeout: 1500 });
+        } else {
+          setTimeout(enableVideo, 1200);
+        }
+
+        // Extra safety: if the video errors, revert
+        vid.addEventListener('error', () => frame.classList.remove('video-active'));
+      }
+      // --- END PATCH C ---
+
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -254,7 +321,7 @@
         // Loading state (centered with JS dot animation)
         resultsContainer.innerHTML = `
   <div style="grid-column:1 / -1; display:flex; justify-content:center; align-items:center; width:100%;">
-    <p id="loading-msg" style="font-family:Lora,serif;color:#2B2B2B;margin:0;">
+    <p id="loading-msg" role="status" aria-live="polite" style="font-family:Lora,serif;color:#2B2B2B;margin:0;">
       ARVY is curating<span id="dots"></span>
     </p>
   </div>
@@ -264,9 +331,9 @@
         // Animate dots
         let i = 0;
         const dotsEl = document.getElementById("dots");
-        setInterval(() => {
+        const dotInterval = setInterval(() => { // Store interval to clear it
           i = (i + 1) % 4; // 0–3
-          dotsEl.textContent = ".".repeat(i);
+          if (dotsEl) dotsEl.textContent = ".".repeat(i);
         }, 400);
 
         console.log(`[${PERSONA}] curate-submit`);
@@ -277,6 +344,7 @@
           body: JSON.stringify({ prompt: userInput }),
         })
         .then(async (res) => {
+          clearInterval(dotInterval); // Stop dots on response
           if (!res.ok) {
             const data = await res.json().catch(() => ({}));
             const msg = data?.error?.message || 'Could not curate right now.';
@@ -287,19 +355,42 @@
         .then((items) => {
           resultsContainer.innerHTML = '';
           resultsContainer.style.display = 'grid';
+
+          // DOM-safe render (no innerHTML for untrusted text)
+          const frag = document.createDocumentFragment();
           items.forEach((it) => {
-            const cardHTML = `
-              <article class="card">
-                <img src="${it.image}" alt="${it.title}">
-                <div class="pad">
-                  <h4>${it.title}</h4>
-                  <p class="card-description">${it.desc}</p>
-                  <div class="ghost">₹${it.price} ${it.currency}</div>
-                  <button class="buy-btn" data-product-id="${it.id}">Buy</button>
-                </div>
-              </article>`;
-            resultsContainer.innerHTML += cardHTML;
+            const article = document.createElement('article');
+            article.className = 'card';
+
+            const img = document.createElement('img');
+            img.loading = 'lazy';
+            img.src = it.image;
+            img.alt = it.title;
+
+            const pad = document.createElement('div');
+            pad.className = 'pad';
+
+            const h4 = document.createElement('h4');
+            h4.textContent = it.title;
+
+            const p = document.createElement('p');
+            p.className = 'card-description';
+            p.textContent = it.desc;
+
+            const price = document.createElement('div');
+            price.className = 'ghost';
+            price.textContent = `₹${it.price} ${it.currency}`;
+
+            const btn = document.createElement('button');
+            btn.className = 'buy-btn';
+            btn.setAttribute('data-product-id', it.id);
+            btn.textContent = 'Buy';
+
+            pad.append(h4, p, price, btn);
+            article.append(img, pad);
+            frag.appendChild(article);
           });
+          resultsContainer.appendChild(frag);
 
           resultsContainer.querySelectorAll('.buy-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
@@ -320,8 +411,13 @@
           });
         })
         .catch((err) => {
-          resultsContainer.innerHTML =
-            `<p style="text-align:center;font-family:Lora,serif;color:#2B2B2B;">${err.message}</p>`;
+          clearInterval(dotInterval); // Stop dots on error
+          resultsContainer.innerHTML = '';const p = document.createElement('p');
+          p.style.textAlign = 'center';
+          p.style.fontFamily = 'Lora,serif';
+          p.style.color = '#2B2B2B';
+          p.textContent = err.message || 'Could not curate right now.';
+          resultsContainer.appendChild(p);
           console.warn(`[${PERSONA}] curate-error:`, err?.message);
         });
       });
