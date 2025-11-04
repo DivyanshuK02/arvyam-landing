@@ -78,8 +78,13 @@
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{background:var(--accent); color:var(--accent-ink)}
-    /* Keyboard focus visibility (a11y) */
-    .btn:focus-visible, .input:focus-visible { outline: 3px solid #6EA7FF; outline-offset: 3px; }
+    /* Keyboard focus visibility (a11y) — brand-tuned, high contrast */
+    .btn:focus-visible, .input:focus-visible{
+       outline:2px solid rgba(43,43,43,.75);       /* dark inner ring for 3:1 contrast */
+       outline-offset:3px;
+       box-shadow:0 0 0 4px rgba(230,177,126,.28);/* soft accent halo for brand feel */
+    }
+    .input:focus-visible{ border-color: rgba(230,177,126,.55); }
 
     /* Photo frame - taller hero */
     .frame{background:#fff; border-radius:var(--radius-photo); overflow:hidden; box-shadow:var(--shadow)}
@@ -131,8 +136,20 @@
     @media(min-width:960px){ .grid{grid-template-columns:repeat(3,1fr)} }
     .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
     .card .pad{padding:18px; text-align:center}
-    /* Avoid CLS on card images */
-    .card img{ aspect-ratio:4/3; width:100%; height:auto; object-fit:cover }
+    /* Cards — aligned heights, no cropping */
+    .card{ display:flex; flex-direction:column; }              /* let content stretch uniformly */
+    .card img{
+       display:block;
+       width:auto;              /* keep natural proportions */
+       height:auto;
+       max-height:420px;        /* cap to align rows without cropping */
+       margin-inline:auto;      /* center narrower portraits/landscapes */
+    }
+    .card .pad{
+       flex:1;                  /* text area grows to fill remaining space */
+       display:flex; flex-direction:column; gap:12px;
+       justify-content:space-between;     /* keeps Buy button aligned across cards */
+    }
     /* Cards: gentle fade-in on render (CSS-only). Respects reduced motion. */
     @keyframes cardFade { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
     .card{ animation: cardFade .5s ease-out forwards; opacity:0; }
@@ -159,6 +176,7 @@
     }
 @media (max-width: 480px){
   .buy-btn{ min-height:44px; }
+  .card img{ max-height:340px; }      /* mobile-friendly cap */
 }
   </style>
 </head>
