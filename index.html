@@ -134,28 +134,30 @@
       text-align:center;
     }
     @media(min-width:960px){ .grid{grid-template-columns:repeat(3,1fr)} }
-    .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
-    .card .pad{padding:18px; text-align:center}
-    /* Cards — aligned heights, no cropping */
-    .card{ display:flex; flex-direction:column; }              /* let content stretch uniformly */
-    .card img{
-       display:block;
-       width:auto;              /* keep natural proportions */
-       height:auto;
-       max-height:420px;        /* cap to align rows without cropping */
-       margin-inline:auto;      /* center narrower portraits/landscapes */
+    .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column}
+    .card .media{
+      aspect-ratio:4/5;              /* consistent media box across all SKUs */
+      background:#fff;               /* calm, neutral well */
+      display:flex; align-items:center; justify-content:center;
+      padding:8px;                   /* gentle breathing room around images */
+    }
+    .card .media img{
+      max-width:100%; max-height:100%;
+      width:auto; height:auto;       /* preserve natural proportions */
+      object-fit:contain;            /* never crop, never skew */
+      display:block;
     }
     .card .pad{
-       flex:1;                  /* text area grows to fill remaining space */
-       display:flex; flex-direction:column; gap:12px;
-       justify-content:space-between;     /* keeps Buy button aligned across cards */
+      padding:20px 18px 22px;        /* tuned rhythm */
+      text-align:center;
+      display:grid; grid-template-rows:auto 1fr auto auto; row-gap:10px;
     }
     /* Cards: gentle fade-in on render (CSS-only). Respects reduced motion. */
     @keyframes cardFade { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
     .card{ animation: cardFade .5s ease-out forwards; opacity:0; }
     @media (prefers-reduced-motion: reduce){ .card{ animation:none; opacity:1; } }
-    .card h4{font-weight:600; font-size:20px; margin:8px 0 12px}
-    .card-description{font-family:'Lora',serif; font-size:16px; color:var(--ink); margin-top:8px; line-height:1.6}
+    .card h4{font-weight:600; font-size:20px; margin:2px 0 6px}
+    .card-description{font-family:'Lora',serif; font-size:16px; color:var(--ink); margin:0 0 6px; line-height:1.6}
     .ghost{
       background:#fff; border-radius:12px; padding:12px 20px; font-weight:600; font-size:16px;
       display:inline-block; font-family:"Playfair Display",Georgia,serif; margin-top:10px;
@@ -176,7 +178,6 @@
     }
 @media (max-width: 480px){
   .buy-btn{ min-height:44px; }
-  .card img{ max-height:340px; }      /* mobile-friendly cap */
 }
   </style>
 </head>
@@ -380,10 +381,13 @@
             const article = document.createElement('article');
             article.className = 'card';
 
+            const media = document.createElement('div');
+            media.className = 'media';
             const img = document.createElement('img');
             img.loading = 'lazy';
             img.src = it.image;
             img.alt = it.title;
+            media.appendChild(img);
 
             const pad = document.createElement('div');
             pad.className = 'pad';
@@ -405,7 +409,7 @@
             btn.textContent = 'Buy';
 
             pad.append(h4, p, price, btn);
-            article.append(img, pad);
+            article.append(media, pad);
             frag.appendChild(article);
           });
           resultsContainer.appendChild(frag);
