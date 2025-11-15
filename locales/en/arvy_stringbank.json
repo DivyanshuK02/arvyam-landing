@@ -1,0 +1,72 @@
+{
+  "app": {
+    "title": "ARVYAM",
+    "tagline": "Curated Flowers for Every Emotion"
+  },
+  "search": {
+    "placeholder": "Describe the occasion or emotion...",
+    "button": "Curate My Bouquet",
+    "loading": "Finding the perfect blooms...",
+    "error_generic": "Something went wrong. Please try again.",
+    "error_network": "Unable to connect. Check your internet.",
+    "error_validation": "Please describe what you're looking for."
+  },
+  "intent": {
+    "question1": "Who is this gift for?",
+    "question2": "What's the occasion?",
+    "question3": "What feeling should it convey?",
+    "skip": "Skip",
+    "progress": "Question {current} of {total}",
+    "relationship": {
+      "romantic": "Romantic Partner",
+      "family": "Family Member",
+      "friend": "Friend",
+      "colleague": "Colleague",
+      "self": "For Myself"
+    },
+    "occasion": {
+      "birthday": "Birthday",
+      "anniversary": "Anniversary",
+      "apology": "Apology",
+      "celebration": "Celebration",
+      "justbecause": "Just Because",
+      "sympathy": "Sympathy"
+    },
+    "tone": {
+      "joyful": "Joyful",
+      "romantic": "Romantic",
+      "supportive": "Supportive",
+      "elegant": "Elegant",
+      "bright": "Bright",
+      "calm": "Calm"
+    }
+  },
+  "consent": {
+    "title": "We Value Your Privacy",
+    "message": "We use cookies to improve your experience and analyze site usage.",
+    "accept": "Accept All",
+    "reject": "Reject Non-Essential",
+    "learnMore": "Learn more",
+    "privacyUrl": "/privacy",
+    "explanation": "We use cookies to improve your experience. You can choose which cookies to accept.",
+    "functional": "Functional Cookies (Required)",
+    "analytics": "Analytics Cookies (Optional)",
+    "customize": "Customize",
+    "save_preferences": "Save Preferences"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "shipping": "Shipping Info",
+    "returns": "Returns & Refunds",
+    "contact": "Contact Us"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "hi": "हिन्दी",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "bn": "বাংলা"
+  }
+}

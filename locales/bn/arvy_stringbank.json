@@ -1,0 +1,72 @@
+{
+  "app": {
+    "title": "ARVYAM",
+    "tagline": "[BN-TODO] Curated Flowers for Every Emotion"
+  },
+  "search": {
+    "placeholder": "[BN-TODO] Describe the occasion or emotion...",
+    "button": "[BN-TODO] Curate My Bouquet",
+    "loading": "[BN-TODO] Finding the perfect blooms...",
+    "error_generic": "[BN-TODO] Something went wrong. Please try again.",
+    "error_network": "[BN-TODO] Unable to connect. Check your internet.",
+    "error_validation": "[BN-TODO] Please describe what you're looking for."
+  },
+  "intent": {
+    "question1": "[BN-TODO] Who is this gift for?",
+    "question2": "[BN-TODO] What's the occasion?",
+    "question3": "[BN-TODO] What feeling should it convey?",
+    "skip": "[BN-TODO] Skip",
+    "progress": "[BN-TODO] Question {current} of {total}",
+    "relationship": {
+      "romantic": "[BN-TODO] Romantic Partner",
+      "family": "[BN-TODO] Family Member",
+      "friend": "[BN-TODO] Friend",
+      "colleague": "[BN-TODO] Colleague",
+      "self": "[BN-TODO] For Myself"
+    },
+    "occasion": {
+      "birthday": "[BN-TODO] Birthday",
+      "anniversary": "[BN-TODO] Anniversary",
+      "apology": "[BN-TODO] Apology",
+      "celebration": "[BN-TODO] Celebration",
+      "justbecause": "[BN-TODO] Just Because",
+      "sympathy": "[BN-TODO] Sympathy"
+    },
+    "tone": {
+      "joyful": "[BN-TODO] Joyful",
+      "romantic": "[BN-TODO] Romantic",
+      "supportive": "[BN-TODO] Supportive",
+      "elegant": "[BN-TODO] Elegant",
+      "bright": "[BN-TODO] Bright",
+      "calm": "[BN-TODO] Calm"
+    }
+  },
+  "consent": {
+    "title": "[BN-TODO] We Value Your Privacy",
+    "message": "[BN-TODO] We use cookies to improve your experience and analyze site usage.",
+    "accept": "[BN-TODO] Accept All",
+    "reject": "[BN-TODO] Reject Non-Essential",
+    "learnMore": "[BN-TODO] Learn more",
+    "privacyUrl": "/privacy",
+    "explanation": "[BN-TODO] We use cookies to improve your experience. You can choose which cookies to accept.",
+    "functional": "[BN-TODO] Functional Cookies (Required)",
+    "analytics": "[BN-TODO] Analytics Cookies (Optional)",
+    "customize": "[BN-TODO] Customize",
+    "save_preferences": "[BN-TODO] Save Preferences"
+  },
+  "footer": {
+    "privacy": "[BN-TODO] Privacy Policy",
+    "terms": "[BN-TODO] Terms of Service",
+    "shipping": "[BN-TODO] Shipping Info",
+    "returns": "[BN-TODO] Returns & Refunds",
+    "contact": "[BN-TODO] Contact Us"
+  },
+  "language": {
+    "label": "[BN-TODO] Language",
+    "en": "English",
+    "hi": "हिन्दी",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "bn": "বাংলা"
+  }
+}

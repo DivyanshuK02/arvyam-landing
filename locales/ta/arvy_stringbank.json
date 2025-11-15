@@ -1,0 +1,72 @@
+{
+  "app": {
+    "title": "ARVYAM",
+    "tagline": "[TA-TODO] Curated Flowers for Every Emotion"
+  },
+  "search": {
+    "placeholder": "[TA-TODO] Describe the occasion or emotion...",
+    "button": "[TA-TODO] Curate My Bouquet",
+    "loading": "[TA-TODO] Finding the perfect blooms...",
+    "error_generic": "[TA-TODO] Something went wrong. Please try again.",
+    "error_network": "[TA-TODO] Unable to connect. Check your internet.",
+    "error_validation": "[TA-TODO] Please describe what you're looking for."
+  },
+  "intent": {
+    "question1": "[TA-TODO] Who is this gift for?",
+    "question2": "[TA-TODO] What's the occasion?",
+    "question3": "[TA-TODO] What feeling should it convey?",
+    "skip": "[TA-TODO] Skip",
+    "progress": "[TA-TODO] Question {current} of {total}",
+    "relationship": {
+      "romantic": "[TA-TODO] Romantic Partner",
+      "family": "[TA-TODO] Family Member",
+      "friend": "[TA-TODO] Friend",
+      "colleague": "[TA-TODO] Colleague",
+      "self": "[TA-TODO] For Myself"
+    },
+    "occasion": {
+      "birthday": "[TA-TODO] Birthday",
+      "anniversary": "[TA-TODO] Anniversary",
+      "apology": "[TA-TODO] Apology",
+      "celebration": "[TA-TODO] Celebration",
+      "justbecause": "[TA-TODO] Just Because",
+      "sympathy": "[TA-TODO] Sympathy"
+    },
+    "tone": {
+      "joyful": "[TA-TODO] Joyful",
+      "romantic": "[TA-TODO] Romantic",
+      "supportive": "[TA-TODO] Supportive",
+      "elegant": "[TA-TODO] Elegant",
+      "bright": "[TA-TODO] Bright",
+      "calm": "[TA-TODO] Calm"
+    }
+  },
+  "consent": {
+    "title": "[TA-TODO] We Value Your Privacy",
+    "message": "[TA-TODO] We use cookies to improve your experience and analyze site usage.",
+    "accept": "[TA-TODO] Accept All",
+    "reject": "[TA-TODO] Reject Non-Essential",
+    "learnMore": "[TA-TODO] Learn more",
+    "privacyUrl": "/privacy",
+    "explanation": "[TA-TODO] We use cookies to improve your experience. You can choose which cookies to accept.",
+    "functional": "[TA-TODO] Functional Cookies (Required)",
+    "analytics": "[TA-TODO] Analytics Cookies (Optional)",
+    "customize": "[TA-TODO] Customize",
+    "save_preferences": "[TA-TODO] Save Preferences"
+  },
+  "footer": {
+    "privacy": "[TA-TODO] Privacy Policy",
+    "terms": "[TA-TODO] Terms of Service",
+    "shipping": "[TA-TODO] Shipping Info",
+    "returns": "[TA-TODO] Returns & Refunds",
+    "contact": "[TA-TODO] Contact Us"
+  },
+  "language": {
+    "label": "[TA-TODO] Language",
+    "en": "English",
+    "hi": "हिन्दी",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "bn": "বাংলা"
+  }
+}
