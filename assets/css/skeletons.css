@@ -1,0 +1,240 @@
+/**
+ * ARVYAM Skeleton Loading States
+ * Phase 2 UI/UX - Step 5: Result Card Component
+ * Provides shimmer animations while content loads
+ */
+
+/* ========================================
+   CSS Custom Properties
+   ======================================== */
+
+:root {
+  /* Skeleton Colors */
+  --skeleton-bg: #e5e7eb;
+  --skeleton-shimmer: #f3f4f6;
+  --skeleton-animation-duration: 1.5s;
+}
+
+/* ========================================
+   Skeleton Card Structure
+   ======================================== */
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: 0 1px 3px var(--card-shadow);
+  overflow: hidden;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ========================================
+   Skeleton Image Placeholder
+   ======================================== */
+
+.skeleton__image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--skeleton-bg);
+  overflow: hidden;
+  border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
+}
+
+.skeleton__image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--skeleton-shimmer) 50%,
+    transparent 100%
+  );
+  animation: shimmer var(--skeleton-animation-duration) ease-in-out infinite;
+}
+
+/* ========================================
+   Skeleton Content Area
+   ======================================== */
+
+.skeleton__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: var(--card-padding, 1rem);
+  flex: 1;
+}
+
+/* ========================================
+   Skeleton Text Lines
+   ======================================== */
+
+.skeleton__text {
+  position: relative;
+  height: 1rem;
+  background: var(--skeleton-bg);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.skeleton__text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--skeleton-shimmer) 50%,
+    transparent 100%
+  );
+  animation: shimmer var(--skeleton-animation-duration) ease-in-out infinite;
+}
+
+/* Title - Wider and taller */
+.skeleton__text--title {
+  height: 1.5rem;
+  width: 70%;
+  margin-bottom: 0.25rem;
+}
+
+/* Subtitle - Medium width */
+.skeleton__text--subtitle {
+  height: 0.875rem;
+  width: 50%;
+  margin-bottom: 0.5rem;
+}
+
+/* Description lines */
+.skeleton__text--line {
+  height: 1rem;
+  width: 100%;
+}
+
+.skeleton__text--line:nth-child(4) {
+  width: 85%;
+}
+
+/* Button placeholder */
+.skeleton__text--button {
+  height: 44px;
+  width: 100%;
+  margin-top: auto;
+  border-radius: 0.5rem;
+}
+
+/* ========================================
+   Shimmer Animation
+   ======================================== */
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 0%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Alternative pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Optional pulse animation for elements */
+.skeleton--pulse .skeleton__text,
+.skeleton--pulse .skeleton__image {
+  animation: pulse var(--skeleton-animation-duration) ease-in-out infinite;
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+
+/* Tablet: 640px+ */
+@media (min-width: 640px) {
+  .skeleton__content {
+    gap: 0.875rem;
+    padding: 1.25rem;
+  }
+
+  .skeleton__text--title {
+    height: 1.625rem;
+  }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+  .skeleton__content {
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .skeleton__text--title {
+    height: 1.75rem;
+    width: 65%;
+  }
+
+  .skeleton__text--subtitle {
+    height: 1rem;
+  }
+
+  .skeleton__text--line {
+    height: 1.125rem;
+  }
+}
+
+/* ========================================
+   Dark Mode Support
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skeleton-bg: #374151;
+    --skeleton-shimmer: #4b5563;
+  }
+}
+
+/* ========================================
+   Reduced Motion Support
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton__image::before,
+  .skeleton__text::before {
+    animation: none;
+  }
+
+  /* Use simple fade instead of shimmer */
+  .skeleton__image,
+  .skeleton__text {
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+  .skeleton-card {
+    display: none;
+  }
+}

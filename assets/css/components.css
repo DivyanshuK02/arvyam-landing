@@ -1,0 +1,294 @@
+/**
+ * ARVYAM Component Styles
+ * Phase 2 UI/UX - Step 5: Result Card Component
+ */
+
+/* ========================================
+   CSS Custom Properties
+   ======================================== */
+
+:root {
+  /* Result Card Colors */
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: rgba(0, 0, 0, 0.15);
+  --card-text-primary: #111827;
+  --card-text-secondary: #6b7280;
+  --card-text-muted: #9ca3af;
+
+  /* CTA Button Colors */
+  --cta-bg: #059669;
+  --cta-bg-hover: #047857;
+  --cta-bg-active: #065f46;
+  --cta-text: #ffffff;
+  --cta-focus-ring: #10b981;
+
+  /* Spacing */
+  --card-padding: 1rem;
+  --card-gap: 1rem;
+  --card-border-radius: 0.75rem;
+
+  /* Typography */
+  --card-title-size: 1.25rem;
+  --card-title-weight: 600;
+  --card-subtitle-size: 0.875rem;
+  --card-subtitle-weight: 500;
+  --card-description-size: 0.9375rem;
+  --card-description-weight: 400;
+
+  /* Transitions */
+  --card-transition: all 0.2s ease-in-out;
+}
+
+/* ========================================
+   Result Card Base Styles
+   ======================================== */
+
+.result-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: 0 1px 3px var(--card-shadow);
+  transition: var(--card-transition);
+  cursor: pointer;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Hover effects - desktop only (not on touch/active) */
+@media (hover: hover) and (pointer: fine) {
+  .result-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px var(--card-shadow-hover);
+  }
+}
+
+/* Focus state for keyboard navigation */
+.result-card:focus {
+  outline: 2px solid var(--cta-focus-ring);
+  outline-offset: 2px;
+}
+
+.result-card:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.result-card:focus-visible {
+  outline: 2px solid var(--cta-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Image Container
+   ======================================== */
+
+.result-card__image-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #f3f4f6;
+  border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
+}
+
+.result-card__picture {
+  display: block;
+  width: 100%;
+}
+
+.result-card__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Image hover effect - desktop only */
+@media (hover: hover) and (pointer: fine) {
+  .result-card:hover .result-card__image {
+    transform: scale(1.05);
+  }
+}
+
+/* ========================================
+   Content Area
+   ======================================== */
+
+.result-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: var(--card-padding);
+  flex: 1;
+}
+
+/* Title */
+.result-card__title {
+  margin: 0;
+  font-size: var(--card-title-size);
+  font-weight: var(--card-title-weight);
+  color: var(--card-text-primary);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* Subtitle */
+.result-card__subtitle {
+  margin: 0;
+  font-size: var(--card-subtitle-size);
+  font-weight: var(--card-subtitle-weight);
+  color: var(--card-text-secondary);
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Description */
+.result-card__description {
+  margin: 0;
+  font-size: var(--card-description-size);
+  font-weight: var(--card-description-weight);
+  color: var(--card-text-muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ========================================
+   CTA Button
+   ======================================== */
+
+.result-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1.5rem;
+  margin-top: auto;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cta-text);
+  background: var(--cta-bg);
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: var(--card-transition);
+  text-align: center;
+  width: 100%;
+}
+
+.result-card__cta:hover {
+  background: var(--cta-bg-hover);
+}
+
+.result-card__cta:active {
+  background: var(--cta-bg-active);
+  transform: translateY(1px);
+}
+
+.result-card__cta:focus {
+  outline: 2px solid var(--cta-focus-ring);
+  outline-offset: 2px;
+}
+
+.result-card__cta:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.result-card__cta:focus-visible {
+  outline: 2px solid var(--cta-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Responsive Layouts
+   ======================================== */
+
+/* Mobile: 320px - Full width single column */
+@media (max-width: 639px) {
+  .result-card {
+    max-width: 100%;
+  }
+
+  .result-card__content {
+    padding: 1rem;
+  }
+
+  .result-card__title {
+    font-size: 1.125rem;
+  }
+}
+
+/* Tablet: 640px - 2 column grid */
+@media (min-width: 640px) {
+  .result-card {
+    --card-padding: 1.25rem;
+  }
+
+  .result-card__content {
+    gap: 0.875rem;
+  }
+}
+
+/* Desktop: 1024px+ - 3-4 column grid */
+@media (min-width: 1024px) {
+  .result-card {
+    --card-padding: 1.5rem;
+  }
+
+  .result-card__content {
+    gap: 1rem;
+  }
+
+  .result-card__title {
+    font-size: 1.375rem;
+  }
+
+  .result-card__description {
+    font-size: 1rem;
+  }
+}
+
+/* ========================================
+   Dark Mode Support (Optional)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: #1f2937;
+    --card-border: #374151;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: rgba(0, 0, 0, 0.5);
+    --card-text-primary: #f9fafb;
+    --card-text-secondary: #d1d5db;
+    --card-text-muted: #9ca3af;
+  }
+
+  .result-card__image-wrapper {
+    background: #374151;
+  }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+  .result-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .result-card:hover {
+    transform: none;
+  }
+
+  .result-card__cta {
+    display: none;
+  }
+}
