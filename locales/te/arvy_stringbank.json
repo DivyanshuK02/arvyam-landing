@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "ARVYAM",
+    "tagline": "[TE-TODO] Curated Flowers for Every Emotion"
+  },
+  "search": {
+    "placeholder": "[TE-TODO] Describe the occasion or emotion...",
+    "button": "[TE-TODO] Curate My Bouquet",
+    "loading": "[TE-TODO] Finding the perfect blooms...",
+    "error_generic": "[TE-TODO] Something went wrong. Please try again.",
+    "error_network": "[TE-TODO] Unable to connect. Check your internet.",
+    "error_validation": "[TE-TODO] Please describe what you're looking for."
+  },
+  "intent": {
+    "question1": "[TE-TODO] Who is this gift for?",
+    "question2": "[TE-TODO] What's the occasion?",
+    "question3": "[TE-TODO] What feeling should it convey?",
+    "skip": "[TE-TODO] Skip",
+    "progress": "[TE-TODO] Question {current} of {total}",
+    "relationship": {
+      "romantic": "[TE-TODO] Romantic Partner",
+      "family": "[TE-TODO] Family Member",
+      "friend": "[TE-TODO] Friend",
+      "colleague": "[TE-TODO] Colleague",
+      "self": "[TE-TODO] For Myself"
+    },
+    "occasion": {
+      "birthday": "[TE-TODO] Birthday",
+      "anniversary": "[TE-TODO] Anniversary",
+      "apology": "[TE-TODO] Apology",
+      "celebration": "[TE-TODO] Celebration",
+      "justbecause": "[TE-TODO] Just Because",
+      "sympathy": "[TE-TODO] Sympathy"
+    },
+    "tone": {
+      "joyful": "[TE-TODO] Joyful",
+      "romantic": "[TE-TODO] Romantic",
+      "supportive": "[TE-TODO] Supportive",
+      "elegant": "[TE-TODO] Elegant",
+      "bright": "[TE-TODO] Bright",
+      "calm": "[TE-TODO] Calm"
+    }
+  },
+  "consent": {
+    "title": "[TE-TODO] We Value Your Privacy",
+    "explanation": "[TE-TODO] We use cookies to improve your experience. You can choose which cookies to accept.",
+    "functional": "[TE-TODO] Functional Cookies (Required)",
+    "analytics": "[TE-TODO] Analytics Cookies (Optional)",
+    "accept_all": "[TE-TODO] Accept All",
+    "reject_optional": "[TE-TODO] Reject Non-Essential",
+    "customize": "[TE-TODO] Customize",
+    "save_preferences": "[TE-TODO] Save Preferences"
+  },
+  "footer": {
+    "privacy": "[TE-TODO] Privacy Policy",
+    "terms": "[TE-TODO] Terms of Service",
+    "shipping": "[TE-TODO] Shipping Info",
+    "returns": "[TE-TODO] Returns & Refunds",
+    "contact": "[TE-TODO] Contact Us"
+  },
+  "language": {
+    "label": "[TE-TODO] Language",
+    "en": "English",
+    "hi": "हिन्दी",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "bn": "বাংলা"
+  }
+}
