@@ -94,17 +94,12 @@
   border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
 }
 
-.result-card__picture {
-  display: block;
-  width: 100%;
-}
-
 .result-card__image {
   display: block;
   width: 100%;
   height: auto;
   object-fit: cover;
-  aspect-ratio: 4/3;
+  aspect-ratio: 4/5;  /* Portrait images for catalog */
   transition: transform 0.3s ease-in-out;
 }
 
@@ -234,7 +229,7 @@
   }
 }
 
-/* Desktop: 1024px+ - 3-4 column grid */
+/* Desktop: 960px+ - ALWAYS 3 column grid (constitutional requirement) */
 @media (min-width: 1024px) {
   .result-card {
     --card-padding: 1.5rem;

@@ -38,7 +38,7 @@
 .skeleton__image {
   position: relative;
   width: 100%;
-  aspect-ratio: 4/3;
+  aspect-ratio: 4/5;  /* Match actual card */
   background: var(--skeleton-bg);
   overflow: hidden;
   border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;

@@ -1,7 +1,7 @@
 /**
  * ARVYAM Result Card Component
  * Displays a single curated bouquet with image, title, subtitle, description, and CTA
- * Phase 2 UI/UX - Step 5
+ * Phase 2 UI/UX - Step 5 (SPEC COMPLIANT)
  */
 
 import { t } from '../i18n/strings.js';
@@ -18,13 +18,11 @@ export default class ResultCard {
    * @param {string} data.name - Bouquet name (1-2 words)
    * @param {string} data.occasion - Occasion/relationship hint (3-5 words)
    * @param {string} data.description - Brief description (≤25 words)
-   * @param {string} data.imageWebp - Path to WebP image
-   * @param {string} data.imageJpg - Path to JPG fallback image
+   * @param {string} data.image - Path to WebP image (no fallback needed)
    * @param {string} [data.imageAlt] - Optional alt text override
    * @param {Object} [options={}] - Configuration options
    * @param {string} [options.lang='en'] - Language code
    * @param {boolean} [options.lazyLoad=true] - Enable lazy loading
-   * @param {string} [options.aspectRatio='4/3'] - CSS aspect ratio
    * @param {Function} [options.onSelect] - Callback when card is selected
    */
   constructor(data, options = {}) {
@@ -32,7 +30,6 @@ export default class ResultCard {
     this.options = {
       lang: 'en',
       lazyLoad: true,
-      aspectRatio: '4/3',
       onSelect: null,
       ...options
     };
@@ -90,18 +87,17 @@ export default class ResultCard {
         : t('result.image_alt', this.options.lang, { name: this.data.name })
     ]);
 
+    // SPEC COMPLIANT: Simple <img> with WebP only, width/height attributes
     card.innerHTML = `
       <div class="result-card__image-wrapper">
-        <picture class="result-card__picture">
-          <source srcset="${this.escapeHtml(this.data.imageWebp)}" type="image/webp">
-          <img
-            src="${this.escapeHtml(this.data.imageJpg)}"
-            alt="${this.escapeHtml(altText)}"
-            ${this.options.lazyLoad ? 'loading="lazy"' : ''}
-            class="result-card__image"
-            style="aspect-ratio: ${this.options.aspectRatio}"
-          >
-        </picture>
+        <img
+          src="${this.escapeHtml(this.data.image)}"
+          alt="${this.escapeHtml(altText)}"
+          width="400"
+          height="400"
+          ${this.options.lazyLoad ? 'loading="lazy"' : ''}
+          class="result-card__image"
+        >
       </div>
 
       <div class="result-card__content">
