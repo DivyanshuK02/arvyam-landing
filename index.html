@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ARVYAM — AI-Curated Floral Experiences</title>
+  <title>ARVYAM – AI-Curated Floral Experiences</title>
   <meta name="description" content="Tell us how you feel. Arvyam's AI curates three exquisite, occasion-ready floral experiences." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
   
-  <link href="/assets/css/components.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
 
   <style>
     :root{
@@ -80,23 +80,27 @@
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{background:var(--accent); color:var(--accent-ink)}
-    /* Keyboard focus visibility (a11y) — brand-tuned, high contrast */
     .btn:focus-visible, .input:focus-visible{
-       outline:2px solid rgba(43,43,43,.75);       /* dark inner ring for 3:1 contrast */
+       outline:2px solid rgba(43,43,43,.75);
        outline-offset:3px;
-       box-shadow:0 0 0 4px rgba(230,177,126,.28);/* soft accent halo for brand feel */
+       box-shadow:0 0 0 4px rgba(230,177,126,.28);
     }
     .input:focus-visible{ border-color: rgba(230,177,126,.55); }
 
-    /* Photo frame - taller hero */
+    /* Photo frame */
     .frame{background:#fff; border-radius:var(--radius-photo); overflow:hidden; box-shadow:var(--shadow)}
     .frame img{width:100%; height:100%; object-fit:cover; object-position:center}
     @media(min-width:960px){ .frame{aspect-ratio:4/5} }
 
-    /* --- Hero video feature flag (1-click rollback) --- */#hero-frame .hero-video { display:none; width:100%; height:100%; object-fit:cover; }#hero-frame .hero-poster { display:block; width:100%; height:100%; object-fit:cover; }/* When the figure has .video-active, show video, hide poster */#hero-frame.video-active .hero-video { display:block; }#hero-frame.video-active .hero-poster { display:none; }/* Respect users who prefer reduced motion */@media (prefers-reduced-motion: reduce) {
+    /* Hero video */
+    #hero-frame .hero-video { display:none; width:100%; height:100%; object-fit:cover; }
+    #hero-frame .hero-poster { display:block; width:100%; height:100%; object-fit:cover; }
+    #hero-frame.video-active .hero-video { display:block; }
+    #hero-frame.video-active .hero-poster { display:none; }
+    @media (prefers-reduced-motion: reduce) {
       #hero-frame.video-active .hero-video { display:none; }
       #hero-frame .hero-poster { display:block; }
-      html { scroll-behavior:auto; } /* disable smooth scroll for a11y */
+      html { scroll-behavior:auto; }
     }
 
     /* Lead text */
@@ -128,32 +132,29 @@
     .tile h3{font-weight:600; font-size:22px; margin-top:10px}
     .tile p{font-size:15px; color:var(--muted); margin-top:8px}
 
-    /* --- AUDITOR FIX APPLIED --- */
     .grid{
       margin-top:24px;
       text-align:center;
     }
-    /* --- END FIX --- */
 
     .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column}
     .card .media{
-      aspect-ratio:4/5;              /* matches your masters — 4:5 */
-      background:transparent;        /* remove white frame */
+      aspect-ratio:4/5;
+      background:transparent;
       display:flex; align-items:center; justify-content:center;
-      padding:0;                   /* edge-to-edge image */
-      overflow:hidden;             /* hide stray edges on tiny mismatches */
+      padding:0;
+      overflow:hidden;
     }
     .card .media img{
       width:100%; height:100%;
-      object-fit:cover;            /* fills the 4:5 box; your files are 4:5 so no crop */
+      object-fit:cover;
       display:block;
     }
     .card .pad{
-      padding:16px 16px 18px;       /* tighter content block */
+      padding:16px 16px 18px;
       text-align:center;
       display:grid; grid-template-rows:auto auto 1fr auto; row-gap:6px;
     }
-    /* Cards: gentle fade-in on render (CSS-only). Respects reduced motion. */
     @keyframes cardFade { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
     .card{ animation: cardFade .5s ease-out forwards; opacity:0; }
     @media (prefers-reduced-motion: reduce){ .card{ animation:none; opacity:1; } }
@@ -161,7 +162,7 @@
     .card-description{
       font-family:'Lora',serif; font-size:16px; color:var(--ink);
       margin:0; line-height:1.6;
-      display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;  /* trims long blurbs */
+      display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;
     }
     .ghost{
       background:#fff; border-radius:12px; padding:12px 20px; font-weight:600; font-size:16px;
@@ -176,15 +177,14 @@
     .buy-btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,0.10); background:#222; }
     .buy-btn:active{ transform: translateY(0); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
 
-    /* A11y helper (visually hidden) */
     .sr-only {
       position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
-      overflow:hidden; clip:rect(0,0,1,1); white-space:nowrap; border:0;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
     }
-@media (max-width: 480px){
-  .buy-btn{ min-height:44px; }
-  .card .pad{ padding:14px 14px 16px; row-gap:6px; }
-}
+    @media (max-width: 480px){
+      .buy-btn{ min-height:44px; }
+      .card .pad{ padding:14px 14px 16px; row-gap:6px; }
+    }
   </style>
 </head>
 <body>
@@ -212,7 +212,7 @@
         <figure class="frame" id="hero-frame">
           <img class="hero-poster" src="assets/hero-poster.jpg"
                fetchpriority="high" decoding="async"
-               alt="Soft, editorial bouquet — calm, minimal, cream background." />
+               alt="Soft, editorial bouquet – calm, minimal, cream background." />
 
           <video id="hero-video" class="hero-video" aria-describedby="hero-caption"
                  poster="assets/hero-poster.jpg"
@@ -223,7 +223,7 @@
           <figcaption id="hero-caption" class="sr-only">Ambient hero: a calm bouquet with subtle blueprint lines—silent motion suggesting AI craftsmanship.</figcaption>
           <noscript>
             <img src="assets/hero-poster.jpg"
-                 alt="Soft, editorial bouquet — calm, minimal, cream background.">
+                 alt="Soft, editorial bouquet – calm, minimal, cream background.">
           </noscript>
         </figure>
       </div>
@@ -232,7 +232,7 @@
     <section id="curate" class="container" style="padding-block:84px">
       <h2>Curated Just for You</h2>
       <div class="muted" style="text-align:center; margin-top:6px; font-size:15px;">
-        by ARVY — your meaning engine
+        by ARVY – your meaning engine
       </div>
 
       <div class="curate-card">
@@ -275,4 +275,67 @@
   </main>
   <footer id="policy-footer"></footer>
 
-  <script type="module" src="/assets/js/app.js"></script></body></html>
+  <!-- CRITICAL: Hero video failsafe - runs even if app.js breaks -->
+  <script>
+  (function() {
+    'use strict';
+    
+    // Hero video activation (independent of app.js)
+    function initHeroVideo() {
+      const frame = document.getElementById('hero-frame');
+      const video = document.getElementById('hero-video');
+      
+      if (!frame || !video) return;
+      
+      // Respect reduced motion preference
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+      
+      function activate() {
+        frame.classList.add('video-active');
+        video.muted = true;
+        video.setAttribute('playsinline', '');
+        video.loop = true;
+        
+        const playPromise = video.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(function() {
+            // Autoplay blocked - show poster (default state)
+          });
+        }
+      }
+      
+      // Try immediate activation if data loaded
+      if (video.readyState >= 2) {
+        activate();
+      } else {
+        video.addEventListener('loadeddata', activate, { once: true });
+        try {
+          video.load();
+        } catch (e) {
+          // Load failed - poster remains
+        }
+        
+        // Belt & suspenders: Try again after delay
+        setTimeout(function() {
+          if (video.readyState >= 2) activate();
+        }, 1200);
+      }
+    }
+    
+    // Run when DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeroVideo);
+    } else {
+      initHeroVideo();
+    }
+    
+    // Mark as initialized for app.js to detect
+    window.__heroVideoInitialized = true;
+  })();
+  </script>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
