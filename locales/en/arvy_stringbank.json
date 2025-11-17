@@ -1,0 +1,9 @@
+{
+  "policy": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "cookies": "Cookie Settings",
+    "copyright": "© {year} {company}. All rights reserved.",
+    "legal_nav": "Legal and privacy information"
+  }
+}
