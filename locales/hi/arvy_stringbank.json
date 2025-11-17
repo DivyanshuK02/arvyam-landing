@@ -5,5 +5,12 @@
     "cookies": "कुकी सेटिंग्स",
     "copyright": "© {year} {company}। सर्वाधिकार सुरक्षित।",
     "legal_nav": "कानूनी और गोपनीयता जानकारी"
+  },
+  "result": {
+    "title": "{name}",
+    "subtitle": "{occasion}",
+    "description": "{description}",
+    "cta": "विवरण देखें",
+    "image_alt": "{name} गुलदस्ता"
   }
 }
