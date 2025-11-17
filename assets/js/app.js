@@ -1,6 +1,6 @@
 /**
  * ARVYAM Main Application
- * Integration layer for Phase 2-3 components (Steps 1-8 complete)
+ * Integration layer for Phase 2-3 components (Steps 1-9 complete)
  * 
  * Constitutional Compliance:
  * - Selection Invariance: Always show exactly 3 equal-emphasis cards
@@ -9,7 +9,7 @@
  * - ARVY Persona: Calm, warm, editorial tone (no technical/browser messages to users)
  * - Privacy: No PII in logs, debounced analytics
  * 
- * @version 1.8.0 - Step 8: LanguageSwitch (bilingual EN/HI toggle)
+ * @version 1.9.0 - Step 9: PolicyFooter (legal links + cookie settings)
  */
 
 import { detectLanguage, setLanguage } from './i18n/lang_detect.js';
@@ -20,6 +20,7 @@ import ResultCard from './components/result_card.js';
 import HintForm from './components/hint_form.js';
 import RefineBar from './components/refine_bar.js';
 import LanguageSwitch from './components/language_switch.js';
+import PolicyFooter from './components/policy_footer.js';
 
 // ============================================================================
 // Configuration
@@ -42,6 +43,7 @@ let intentAssist = null;
 let hintForm = null;
 let refineBar = null;
 let languageSwitch = null;
+let policyFooter = null;
 let analyticsEnabled = false;
 let uxTurns = 0; // Track user interaction depth
 
@@ -84,13 +86,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Step 7: Initialize LanguageSwitch (Step 8)
     initializeLanguageSwitch();
     
-    // Step 8: Cache DOM elements
+    // Step 8: Initialize PolicyFooter (Step 9)
+    await initializePolicyFooter();
+    
+    // Step 9: Cache DOM elements
     cacheDOMElements();
     
-    // Step 9: Set up global event listeners
+    // Step 10: Set up global event listeners
     setupGlobalListeners();
     
-    // Step 10: Initialize search functionality
+    // Step 11: Initialize search functionality
     if (searchForm && searchInput && resultsContainer) {
       initializeSearch();
     }
@@ -228,6 +233,25 @@ function initializeLanguageSwitch() {
 }
 
 /**
+ * Initialize PolicyFooter component (Step 9)
+ * Displays legal links (Privacy, Terms) and Cookie Settings button
+ * Progressive enhancement: attaches to #policy-footer if present, else creates new
+ */
+async function initializePolicyFooter() {
+  policyFooter = new PolicyFooter({
+    lang: currentLanguage,
+    privacyUrl: '/privacy',
+    termsUrl: '/terms',
+    copyrightYear: new Date().getFullYear(),
+    companyName: 'ARVYAM'
+  });
+  
+  await policyFooter.mount();
+  
+  console.log('[ARVYAM] PolicyFooter initialized');
+}
+
+/**
  * Cache frequently accessed DOM elements
  */
 function cacheDOMElements() {
@@ -254,6 +278,16 @@ function setupGlobalListeners() {
   
   // Consent change listener
   window.addEventListener('consent-changed', handleConsentChange);
+  
+  // Consent manage listener (from PolicyFooter - Step 9)
+  document.addEventListener('consent:open-manage', () => {
+    if (consentBanner && typeof consentBanner.openManageView === 'function') {
+      consentBanner.openManageView();
+      console.log('[ARVYAM] ConsentBanner manage view opened from PolicyFooter');
+    } else {
+      console.warn('[ARVYAM] ConsentBanner openManageView method not available');
+    }
+  });
   
   // Intent clarified listener
   window.addEventListener('intent-clarified', handleIntentClarified);
@@ -303,7 +337,12 @@ async function handleLanguageChange(event) {
     await refineBar.updateLanguage(lang);
   }
   
-  // 5. ResultCards (re-render existing cards if present)
+  // 5. PolicyFooter
+  if (policyFooter && typeof policyFooter.updateLanguage === 'function') {
+    await policyFooter.updateLanguage(lang);
+  }
+  
+  // 6. ResultCards (re-render existing cards if present)
   const existingCards = resultsContainer?.querySelectorAll('.result-card');
   if (existingCards && existingCards.length > 0) {
     // Re-render cards with new language
@@ -312,7 +351,7 @@ async function handleLanguageChange(event) {
     console.log('[ARVYAM] Note: ResultCards should implement updateLanguage() method');
   }
   
-  // 6. Update static UI text (search placeholder, CTA, etc.)
+  // 7. Update static UI text (search placeholder, CTA, etc.)
   await updateStaticUIText(lang);
 }
 
