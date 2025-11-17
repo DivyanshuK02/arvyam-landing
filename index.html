@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  
+  <!-- AUDITOR NIT 1 FIX: Component CSS (PolicyFooter, ConsentBanner, etc.) -->
+  <link href="/assets/css/components.css" rel="stylesheet">
 
   <style>
     :root{
@@ -187,94 +190,96 @@
 </head>
 <body>
 
-  <header>
+  <header role="banner">
     <div class="container bar">
       <div class="wordmark">ARVYAM</div>
-      </div>
+    </div>
   </header>
 
-  <section class="container" style="padding-block:96px">
-    <div class="row">
-      <div>
-        <h1>Tell us how you feel—<br>we’ll curate your flowers.</h1>
-        <p class="lead muted" style="margin-top:20px">
-          A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
-        </p>
-        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:28px">
-          <a class="btn primary" href="#curate" aria-label="Start your curated gift">Begin my journey</a>
-          <a class="btn" href="#how" aria-label="Learn how Arvyam works">How it works</a>
+  <!-- AUDITOR NIT 5 FIX: <main> landmark for screen readers -->
+  <main id="main-content">
+    
+    <section class="container" style="padding-block:96px">
+      <div class="row">
+        <div>
+          <h1>Tell us how you feel—<br>we'll curate your flowers.</h1>
+          <p class="lead muted" style="margin-top:20px">
+            A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
+          </p>
+          <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:28px">
+            <a class="btn primary" href="#curate" aria-label="Start your curated gift">Begin my journey</a>
+            <a class="btn" href="#how" aria-label="Learn how Arvyam works">How it works</a>
+          </div>
+        </div>
+        <figure class="frame" id="hero-frame">
+          <img class="hero-poster" src="assets/hero-poster.jpg"
+               fetchpriority="high" decoding="async"
+               alt="Soft, editorial bouquet — calm, minimal, cream background." />
+
+          <video id="hero-video" class="hero-video" aria-describedby="hero-caption"
+                 poster="assets/hero-poster.jpg"
+                 preload="none" muted playsinline loop aria-label="Calm editorial hero video">
+            <source src="assets/hero-loop.mp4" type="video/mp4" />
+          </video>
+
+          <figcaption id="hero-caption" class="sr-only">Ambient hero: a calm bouquet with subtle blueprint lines—silent motion suggesting AI craftsmanship.</figcaption>
+          <noscript>
+            <img src="assets/hero-poster.jpg"
+                 alt="Soft, editorial bouquet — calm, minimal, cream background.">
+          </noscript>
+        </figure>
+      </div>
+    </section>
+
+    <section id="curate" class="container" style="padding-block:84px">
+      <h2>Curated Just for You</h2>
+      <div class="muted" style="text-align:center; margin-top:6px; font-size:15px;">
+        by ARVY — your meaning engine
+      </div>
+
+      <div class="curate-card">
+        <label for="feelings-input" class="sr-only">Your message</label>
+
+        <form id="curate-form" class="form-grid">
+          <input id="feelings-input" class="input" name="message"
+                 placeholder="Write a feeling or occasion…"
+                 aria-describedby="field-error hint"
+                 maxlength="240" required>
+          <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
+        </form>
+
+        <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
+
+        <div id="hint" class="hint">Examples: "A quiet thank you for my mentor." · "Celebrating five years together." · "She's had a tough week."</div>
+      </div>
+
+      <div id="curated-results" class="grid"></div>
+    </section>
+
+    <section id="how" class="container" style="padding-block:112px; text-align:center">
+      <h2>How it works</h2>
+      <div class="tiles">
+        <div class="tile">
+          <h3>Express yourself</h3>
+          <p>Write a thought, feeling, or occasion.</p>
+        </div>
+        <div class="tile">
+          <h3>AI curates</h3>
+          <p>We interpret tone & context to understand your intent.</p>
+        </div>
+        <div class="tile">
+          <h3>Your experience</h3>
+          <p>Three refined options that match the mood, beautifully presented.</p>
         </div>
       </div>
-      <figure class="frame" id="hero-frame">
-        <img class="hero-poster" src="assets/hero-poster.jpg"
-             fetchpriority="high" decoding="async"
-             alt="Soft, editorial bouquet — calm, minimal, cream background." />
+    </section>
 
-        <video id="hero-video" class="hero-video" aria-describedby="hero-caption"
-               poster="assets/hero-poster.jpg"
-               preload="none" muted playsinline loop aria-label="Calm editorial hero video">
-          <source src="assets/hero-loop.mp4" type="video/mp4" />
-        </video>
+  </main>
+  <!-- END <main> landmark -->
 
-        <figcaption id="hero-caption" class="sr-only">Ambient hero: a calm bouquet with subtle blueprint lines—silent motion suggesting AI craftsmanship.</figcaption>
-        <noscript>
-          <img src="assets/hero-poster.jpg"
-               alt="Soft, editorial bouquet — calm, minimal, cream background.">
-        </noscript></figure>
-    </div>
-  </section>
+  <footer id="policy-footer" role="contentinfo"></footer>
+  
+  <script type="module" src="/assets/js/app.js"></script>
 
-  <section id="curate" class="container" style="padding-block:84px">
-    <h2>Curated Just for You</h2>
-    <div class="muted" style="text-align:center; margin-top:6px; font-size:15px;">
-      by ARVY — your meaning engine
-    </div>
-
-    <div class="curate-card">
-      <label for="feelings-input" class="sr-only">Your message</label>
-
-      <form id="curate-form" class="form-grid">
-        <input id="feelings-input" class="input" name="message"
-               placeholder="Write a feeling or occasion…"
-               aria-describedby="field-error hint"
-               maxlength="240" required>
-        <button type="submit" class="btn primary" aria-label="Curate suggestions">Curate</button>
-      </form>
-
-      <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
-
-      <div id="hint" class="hint">Examples: “A quiet thank you for my mentor.” · “Celebrating five years together.” · “She’s had a tough week.”</div>
-    </div>
-
-    <div id="curated-results" class="grid"></div>
-  </section>
-
-  <section id="how" class="container" style="padding-block:112px; text-align:center">
-    <h2>How it works</h2>
-    <div class="tiles">
-      <div class="tile">
-        <h3>Express yourself</h3>
-        <p>Write a thought, feeling, or occasion.</p>
-      </div>
-      <div class="tile">
-        <h3>AI curates</h3>
-        <p>We interpret tone & context to understand your intent.</p>
-      </div>
-      <div class="tile">
-        <h3>Your experience</h3>
-        <p>Three refined options that match the mood, beautifully presented.</p>
-      </div>
-    </div>
-  </section>
-
-  <footer style="padding:56px 16px; text-align:center; color:var(--muted)">
-    © <span id="y"></span> ARVYAM — quietly delightful flowers. ·
-    <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> ·
-    <a href="/refund">Refund</a> · <a href="/delivery">Delivery</a> ·
-    <a href="/contact">Contact</a>
-  </footer>
-
-  <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
-  </script>
-  <script type="module" src="/assets/js/app.js"></script></body></html>
+</body>
+</html>
