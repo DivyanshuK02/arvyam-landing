@@ -5,5 +5,12 @@
     "cookies": "Cookie Settings",
     "copyright": "© {year} {company}. All rights reserved.",
     "legal_nav": "Legal and privacy information"
+  },
+  "result": {
+    "title": "{name}",
+    "subtitle": "{occasion}",
+    "description": "{description}",
+    "cta": "See details",
+    "image_alt": "{name} bouquet"
   }
 }
