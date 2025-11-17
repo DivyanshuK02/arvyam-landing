@@ -17,6 +17,7 @@ import { t, preloadStringbanks } from './i18n/strings.js';
 import ConsentBanner from './components/consent_banner.js';
 import IntentAssist from './intent_assist.js';
 import ResultCard from './components/result_card.js';
+import HintForm from './components/hint_form.js';
 
 // ============================================================================
 // Configuration
@@ -36,6 +37,7 @@ const API_BASE = window.ARVYAM_API_BASE || 'https://arvyam-api.onrender.com';
 let currentLanguage = 'en';
 let consentBanner = null;
 let intentAssist = null;
+let hintForm = null;
 let analyticsEnabled = false;
 let uxTurns = 0; // Track user interaction depth
 
@@ -65,13 +67,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Step 4: Initialize Intent Assist
     initializeIntentAssist();
     
-    // Step 5: Cache DOM elements
+    // Step 5: Initialize HintForm
+    initializeHintForm();
+    
+    // Step 6: Cache DOM elements
     cacheDOMElements();
     
-    // Step 6: Set up global event listeners
+    // Step 7: Set up global event listeners
     setupGlobalListeners();
     
-    // Step 7: Initialize search functionality
+    // Step 8: Initialize search functionality
     if (searchForm && searchInput && resultsContainer) {
       initializeSearch();
     }
@@ -139,6 +144,34 @@ function initializeIntentAssist() {
 }
 
 /**
+ * Initialize HintForm component
+ * Allows users to optionally provide structured hints
+ * All fields are optional (Guest-First constitutional requirement)
+ */
+function initializeHintForm() {
+  hintForm = new HintForm({
+    lang: currentLanguage,
+    onSubmit: (hints) => {
+      const prompt = searchInput?.value || '';
+      if (prompt) {
+        searchWithHints(prompt, hints);
+      } else {
+        console.warn('[ARVYAM] Cannot search with hints - no prompt entered');
+      }
+    }
+  });
+  
+  // Try to initialize (fails gracefully if DOM not ready)
+  const initialized = hintForm.init();
+  
+  if (initialized) {
+    console.log('[ARVYAM] HintForm initialized');
+  } else {
+    console.log('[ARVYAM] HintForm skipped (container not present)');
+  }
+}
+
+/**
  * Cache frequently accessed DOM elements
  */
 function cacheDOMElements() {
@@ -183,6 +216,11 @@ async function handleLanguageChange(event) {
   // Update consent banner language if it exists
   if (consentBanner && typeof consentBanner.updateLanguage === 'function') {
     await consentBanner.updateLanguage(currentLanguage);
+  }
+  
+  // Update HintForm language if initialized
+  if (hintForm && typeof hintForm.updateLanguage === 'function') {
+    hintForm.updateLanguage(currentLanguage);
   }
   
   // Re-render current results in new language if they exist
@@ -409,6 +447,110 @@ async function searchArrangements(query) {
   }
   
   return data;
+}
+
+/**
+ * Search for arrangements with structured hints
+ * Includes optional hints from HintForm alongside the main prompt
+ * 
+ * Constitutional: Hints affect curation input, NOT card display
+ * Privacy: No PII in console logs or analytics
+ * 
+ * @param {string} prompt - User's main search query
+ * @param {Object} hints - Structured hints from HintForm
+ * @param {string} [hints.relationship] - Relationship type
+ * @param {string} [hints.occasion] - Occasion type  
+ * @param {string} [hints.budget_inr] - Budget range
+ * @param {string} [hints.delivery_window] - Delivery window
+ * @param {string} [hints.tone_hint] - Free-text preferences (validated, sanitized)
+ * @returns {Promise<void>} Displays results or error
+ */
+async function searchWithHints(prompt, hints) {
+  if (!prompt) {
+    showFieldError('Please describe what you're celebrating.');
+    return;
+  }
+  
+  console.log('[ARVYAM] Searching with hints (structure logged, no PII)');
+  
+  // Show loading state
+  showLoadingState();
+  
+  // Clear previous errors
+  hideFieldError();
+  hideFieldWarning();
+  
+  // Track UX turn
+  uxTurns++;
+  
+  try {
+    // Call backend with prompt + hints
+    const response = await fetch(`${API_BASE}/api/curate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        language: currentLanguage,
+        hints: hints // Backend may ignore for now - graceful degradation
+      })
+    });
+    
+    if (!response.ok) {
+      // Try to extract backend error for developers
+      let devMessage = null;
+      
+      try {
+        const data = await response.json();
+        if (data?.error?.message) {
+          devMessage = data.error.message;
+        }
+      } catch (parseError) {
+        // Ignore
+      }
+      
+      if (devMessage) {
+        console.warn('[ARVYAM] API error:', devMessage);
+      }
+      
+      // Guest-facing ARVY persona message (constitutional requirement)
+      throw new Error('We couldn\'t complete your search. Please try again.');
+    }
+    
+    const data = await response.json();
+    
+    // Validate response
+    if (!data.arrangements || !Array.isArray(data.arrangements)) {
+      console.error('[ARVYAM] Invalid curate response shape:', data);
+      throw new Error('We couldn\'t complete your search. Please try again.');
+    }
+    
+    // Display results
+    displayResults(data);
+    
+    // Track successful search with hints (safe fields only - NO raw text)
+    trackEvent('search_with_hints_completed', {
+      has_relationship: !!hints.relationship,
+      has_occasion: !!hints.occasion,
+      has_budget: !!hints.budget_inr,
+      has_delivery: !!hints.delivery_window,
+      has_tone_hint: !!hints.tone_hint,
+      tone_hint_length_chars: hints.tone_hint?.length || 0,
+      ux_turns: uxTurns
+    });
+    
+  } catch (error) {
+    console.error('[ARVYAM] Search with hints error:', error);
+    
+    // ARVY persona error message
+    showError('We couldn\'t complete your search. Please try again.');
+    
+    trackEvent('search_error', {
+      error_type: 'with_hints',
+      ux_turns: uxTurns
+    });
+  }
 }
 
 // ============================================================================
@@ -734,6 +876,9 @@ function trackEvent(eventName, properties = {}) {
   
   console.log('[ARVYAM] Track event:', eventName, properties);
 }
+
+// Expose trackEvent globally for components (HintForm, etc.)
+window.trackEvent = trackEvent;
 
 // ============================================================================
 // Exports (for testing/module usage)
