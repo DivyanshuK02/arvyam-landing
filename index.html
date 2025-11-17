@@ -126,14 +126,13 @@
     .tile h3{font-weight:600; font-size:22px; margin-top:10px}
     .tile p{font-size:15px; color:var(--muted); margin-top:8px}
 
+    /* --- AUDITOR FIX APPLIED --- */
     .grid{
-      display:none; /* hidden until results arrive */
-      grid-template-columns:1fr;
-      gap:24px;              /* slightly tighter rows */
-      margin-top:24px;       /* less top air */
+      margin-top:24px;
       text-align:center;
     }
-    @media(min-width:960px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    /* --- END FIX --- */
+
     .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column}
     .card .media{
       aspect-ratio:4/5;              /* matches your masters — 4:5 */
