@@ -1131,3 +1131,197 @@
       - Keyboard shortcut (Alt+L?)
 
    ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ========================================================================
+   PolicyFooter Styles - Step 9
+   ======================================================================== */
+
+/**
+ * ARVYAM PolicyFooter Styles
+ * Step 9: Legal footer component
+ * 
+ * Constitutional Compliance:
+ * - Guest-First: Clean, simple layout
+ * - ARVY Persona: Calm typography, minimal styling
+ * - Accessibility: WCAG 2.1 AA (contrast, focus, touch targets)
+ */
+
+/* Container */
+.policy-footer {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--card-text-secondary, #6b7280);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background: var(--footer-bg, #fafaf9);
+  border-top: 1px solid var(--footer-border, #e5e7eb);
+}
+
+/* Navigation wrapper */
+.policy-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Links and buttons */
+.policy-footer__link {
+  /* Reset button styles */
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  
+  /* Link styles */
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  padding: 0 0.75rem;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(107, 114, 128, 0.3);
+  text-underline-offset: 4px;
+  transition: all 0.2s ease;
+}
+
+/* Hover state */
+.policy-footer__link:hover {
+  color: var(--cta-bg, #059669);
+  text-decoration-color: currentColor;
+}
+
+/* Focus state (WCAG 2.1 AA) */
+.policy-footer__link:focus {
+  outline: 2px solid var(--cta-focus-ring, #10b981);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Focus visible (keyboard only) */
+.policy-footer__link:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.policy-footer__link:focus-visible {
+  outline: 2px solid var(--cta-focus-ring, #10b981);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Separator */
+.policy-footer__separator {
+  color: var(--card-text-muted, #9ca3af);
+  user-select: none;
+  padding: 0 0.25rem;
+}
+
+/* Copyright text */
+.policy-footer__copyright {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--card-text-muted, #9ca3af);
+}
+
+/* ========================================================================
+   Responsive Adjustments
+   ======================================================================== */
+
+/* Mobile: Stack vertically for very small screens */
+@media (max-width: 479px) {
+  .policy-footer__nav {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .policy-footer__separator {
+    display: none;
+  }
+  
+  .policy-footer__link {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Tablet and up: horizontal layout */
+@media (min-width: 480px) {
+  .policy-footer__nav {
+    flex-direction: row;
+  }
+}
+
+/* ========================================================================
+   Accessibility Enhancements
+   ======================================================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .policy-footer {
+    border-top-width: 2px;
+  }
+  
+  .policy-footer__link {
+    text-decoration-color: currentColor;
+  }
+  
+  .policy-footer__link:focus {
+    outline-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .policy-footer__link {
+    transition: none;
+  }
+}
+
+/* Dark mode support (if implemented) */
+@media (prefers-color-scheme: dark) {
+  .policy-footer {
+    background: var(--footer-bg-dark, #1f2937);
+    border-top-color: var(--footer-border-dark, #374151);
+    color: var(--card-text-secondary-dark, #9ca3af);
+  }
+  
+  .policy-footer__link:hover {
+    color: var(--cta-bg-dark, #10b981);
+  }
+  
+  .policy-footer__copyright {
+    color: var(--card-text-muted-dark, #6b7280);
+  }
+}
+
+/* ========================================================================
+   Print Styles
+   ======================================================================== */
+
+@media print {
+  .policy-footer {
+    border-top: 1px solid #000;
+    padding: 1rem;
+  }
+  
+  .policy-footer__link {
+    text-decoration: none;
+    color: #000;
+  }
+  
+  /* Show URLs after links in print */
+  .policy-footer__link[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75rem;
+  }
+  
+  .policy-footer__manage::after {
+    content: "";
+  }
+}
+
+/* ========================================================================
+   End PolicyFooter Styles
+   ======================================================================== */
