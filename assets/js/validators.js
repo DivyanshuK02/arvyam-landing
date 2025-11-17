@@ -276,7 +276,7 @@ export const VALID_RELATIONSHIPS = [
 
 /**
  * Valid occasion types for hint form
- * Aligned with 8 emotional anchors from Master Bible
+ * Occasion enum used by HintForm (not the 8 emotion anchors)
  */
 export const VALID_OCCASIONS = [
   'birthday',
