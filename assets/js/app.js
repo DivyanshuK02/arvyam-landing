@@ -18,6 +18,7 @@ import ConsentBanner from './components/consent_banner.js';
 import IntentAssist from './intent_assist.js';
 import ResultCard from './components/result_card.js';
 import HintForm from './components/hint_form.js';
+import RefineBar from './components/refine_bar.js';
 
 // ============================================================================
 // Configuration
@@ -38,8 +39,13 @@ let currentLanguage = 'en';
 let consentBanner = null;
 let intentAssist = null;
 let hintForm = null;
+let refineBar = null;
 let analyticsEnabled = false;
 let uxTurns = 0; // Track user interaction depth
+
+// State for refinement (needed to re-search with adjustments)
+let lastPrompt = '';
+let lastHints = null;
 
 // DOM element references
 let searchForm = null;
@@ -70,13 +76,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Step 5: Initialize HintForm
     initializeHintForm();
     
-    // Step 6: Cache DOM elements
+    // Step 6: Initialize RefineBar
+    initializeRefineBar();
+    
+    // Step 7: Cache DOM elements
     cacheDOMElements();
     
-    // Step 7: Set up global event listeners
+    // Step 8: Set up global event listeners
     setupGlobalListeners();
     
-    // Step 8: Initialize search functionality
+    // Step 9: Initialize search functionality
     if (searchForm && searchInput && resultsContainer) {
       initializeSearch();
     }
@@ -172,6 +181,20 @@ function initializeHintForm() {
 }
 
 /**
+ * Initialize RefineBar component
+ * Allows users to gently adjust their 3 curated arrangements
+ * Shown only after successful results display
+ */
+function initializeRefineBar() {
+  refineBar = new RefineBar({
+    lang: currentLanguage,
+    onSubmit: handleRefineSubmit
+  });
+  
+  console.log('[ARVYAM] RefineBar initialized');
+}
+
+/**
  * Cache frequently accessed DOM elements
  */
 function cacheDOMElements() {
@@ -221,6 +244,11 @@ async function handleLanguageChange(event) {
   // Update HintForm language if initialized
   if (hintForm && typeof hintForm.updateLanguage === 'function') {
     hintForm.updateLanguage(currentLanguage);
+  }
+  
+  // Update RefineBar language if initialized
+  if (refineBar && typeof refineBar.updateLanguage === 'function') {
+    refineBar.updateLanguage(currentLanguage);
   }
   
   // Re-render current results in new language if they exist
@@ -360,6 +388,16 @@ async function handleSearchSubmit(event) {
     ux_turns: uxTurns
   });
   
+  // Store for potential refinement later
+  lastPrompt = query;
+  lastHints = null; // Clear hints for basic search
+  
+  // Reset RefineBar for new search
+  if (refineBar) {
+    refineBar.reset();
+    refineBar.detach();
+  }
+  
   // Show loading state
   showLoadingState();
   
@@ -473,6 +511,16 @@ async function searchWithHints(prompt, hints) {
   
   console.log('[ARVYAM] Searching with hints (structure logged, no PII)');
   
+  // Store for potential refinement later
+  lastPrompt = prompt;
+  lastHints = hints;
+  
+  // Reset RefineBar for new search
+  if (refineBar) {
+    refineBar.reset();
+    refineBar.detach();
+  }
+  
   // Show loading state
   showLoadingState();
   
@@ -548,6 +596,107 @@ async function searchWithHints(prompt, hints) {
     
     trackEvent('search_error', {
       error_type: 'with_hints',
+      ux_turns: uxTurns
+    });
+  }
+}
+
+/**
+ * Handle refinement submission from RefineBar
+ * Validates, sanitizes, and re-searches with combined prompt + refinement
+ * 
+ * Constitutional: Still returns 3-card triad (enforced by displayResults)
+ * Privacy: No raw refinement text in logs or analytics
+ * 
+ * @param {string} refinementText - Sanitized refinement text (already validated)
+ */
+async function handleRefineSubmit(refinementText) {
+  if (!lastPrompt) {
+    console.warn('[ARVYAM] Cannot refine - no previous prompt stored');
+    if (refineBar) {
+      refineBar.showError('Please start a new search first.');
+    }
+    return;
+  }
+  
+  // Privacy guard: never log actual refinement text
+  console.log('[ARVYAM] Refining results (refinement text NOT logged)');
+  
+  // Show loading state
+  showLoadingState();
+  
+  // Detach RefineBar while loading
+  if (refineBar) {
+    refineBar.detach();
+  }
+  
+  // Track UX turn
+  uxTurns++;
+  
+  try {
+    // Option A (future): Call dedicated refine endpoint
+    // const results = await refineArrangements(lastPrompt, refinementText, lastHints);
+    
+    // Option B (current): Combine prompt + refinement for /api/curate
+    // This is safe because refinement is already PII-validated and sanitized
+    const combinedPrompt = `${lastPrompt} (adjust: ${refinementText})`;
+    
+    const response = await fetch(`${API_BASE}/api/curate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: combinedPrompt,
+        language: currentLanguage,
+        hints: lastHints || undefined // Include original hints if they exist
+      })
+    });
+    
+    if (!response.ok) {
+      let devMessage = null;
+      
+      try {
+        const data = await response.json();
+        if (data?.error?.message) {
+          devMessage = data.error.message;
+        }
+      } catch (parseError) {
+        // Ignore
+      }
+      
+      if (devMessage) {
+        console.warn('[ARVYAM] API error:', devMessage);
+      }
+      
+      throw new Error('We couldn\'t adjust the selection. Please try again.');
+    }
+    
+    const data = await response.json();
+    
+    // Validate response
+    if (!data.arrangements || !Array.isArray(data.arrangements)) {
+      console.error('[ARVYAM] Invalid curate response shape:', data);
+      throw new Error('We couldn\'t adjust the selection. Please try again.');
+    }
+    
+    // Display results (includes triad guard + RefineBar re-attachment)
+    displayResults(data);
+    
+    // Track successful refinement (NO raw text, only metadata)
+    trackEvent('refine_completed', {
+      refinement_length_chars: refinementText.length,
+      had_hints: !!lastHints,
+      ux_turns: uxTurns
+    });
+    
+  } catch (error) {
+    console.error('[ARVYAM] Refinement error:', error);
+    
+    // ARVY persona error message
+    showError('We couldn\'t adjust the selection right now. Please try again.');
+    
+    trackEvent('refine_error', {
       ux_turns: uxTurns
     });
   }
@@ -641,6 +790,15 @@ async function displayResults(data) {
     result_count: 3, // Constitutional guarantee
     ux_turns: uxTurns
   });
+  
+  // Attach RefineBar after successful triad display
+  // CONSTITUTIONAL: RefineBar shown only after 3-card result
+  if (refineBar) {
+    refineBar.attach(resultsContainer, {
+      hasHints: !!lastHints,
+      uncertaintyScore: data.uncertainty_score ?? 0
+    });
+  }
   
   // Scroll to results (smooth)
   resultsContainer.scrollIntoView({ 
