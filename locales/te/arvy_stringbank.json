@@ -1,0 +1,7 @@
+{
+  "common": {
+    "loading": "Translation pending",
+    "error": "Translation pending"
+  },
+  "_note": "Full translation pending. Falls back to English."
+}
