@@ -114,6 +114,14 @@ export default class HintForm {
     // Cache field references
     this.cacheFieldReferences();
     
+    // Set initial ARIA state (hidden by default)
+    if (this.container) {
+      this.container.setAttribute('aria-expanded', 'false');
+    }
+    if (this.toggleButton) {
+      this.toggleButton.setAttribute('aria-expanded', 'false');
+    }
+    
     // Bind event handlers
     this.bindEvents();
     
@@ -377,6 +385,12 @@ export default class HintForm {
     
     this.container.removeAttribute('hidden');
     this.container.setAttribute('aria-expanded', 'true');
+    
+    // Mirror aria-expanded on toggle button for screen readers
+    if (this.toggleButton) {
+      this.toggleButton.setAttribute('aria-expanded', 'true');
+    }
+    
     this.isVisible = true;
     
     // Focus first field for accessibility
