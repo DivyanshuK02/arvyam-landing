@@ -12,5 +12,84 @@
     "description": "{description}",
     "cta": "See details",
     "image_alt": "{name} bouquet"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "skip": "Skip for now"
+  },
+  "hero": {
+    "title": "Tell us how you feel—we'll curate your flowers.",
+    "subtitle": "Arvyam removes the paradox of choice. Describe the moment, and our AI curates three exquisite, occasion-ready arrangements."
+  },
+  "search": {
+    "label": "What's the occasion?",
+    "placeholder": "A friend's birthday, feeling grateful, celebrating new job...",
+    "button": "Curate for me",
+    "helper": "We don't store your exact words—only the curated selections we provide.",
+    "error_empty": "Please describe what you're celebrating.",
+    "error_length": "Please keep it under 240 characters."
+  },
+  "hints": {
+    "title": "Help us refine your selection",
+    "description": "These details help us understand the occasion better. All fields are optional.",
+    "relationship_label": "Who is this gift for?",
+    "occasion_label": "What's the occasion?",
+    "budget_label": "Preferred budget range",
+    "delivery_label": "When do you need this?",
+    "tone_label": "Any specific preferences?",
+    "tone_placeholder": "E.g., bright colors, subtle fragrance, modern style",
+    "tone_helper": "Max 100 characters. We don't store names, emails, or phone numbers.",
+    "skip": "Skip for now",
+    "submit": "Continue with these details"
+  },
+  "refine": {
+    "title": "Want to adjust these selections?",
+    "helper": "Tell us how to adjust, and we'll update your selections.",
+    "placeholder": "E.g., 'more vibrant colors' or 'softer palette'",
+    "button": "Refine",
+    "counter": "{turn} / {max}",
+    "max": "You've reached {max} refinements. These are the best-matching options we can offer today.",
+    "error_empty": "Please describe how you'd like us to adjust.",
+    "error_length": "Please keep refinements under 50 characters.",
+    "error_phone": "Please don't include phone numbers.",
+    "error_email": "Please don't include email addresses."
+  },
+  "consent": {
+    "title": "Your privacy matters",
+    "description": "We use cookies to improve your experience. You can customize which cookies we use.",
+    "accept_all": "Accept All",
+    "reject_all": "Reject All",
+    "save_preferences": "Save Preferences",
+    "manage_preferences": "Manage Preferences",
+    "functional": "Functional",
+    "functional_desc": "Required for the site to work (always on)",
+    "analytics": "Analytics",
+    "analytics_desc": "Helps us understand how you use ARVYAM (privacy-first, no personal data)",
+    "marketing": "Marketing",
+    "marketing_desc": "Personalized recommendations and offers"
+  },
+  "results": {
+    "title": "Your curated selections",
+    "card_button": "Select this arrangement",
+    "loading": "Curating your selections..."
+  },
+  "intent_assist": {
+    "relationship_question": "Quick check: who is this for?",
+    "occasion_question": "What's the occasion?",
+    "tone_question": "What feeling are you aiming for?",
+    "skip": "Skip"
+  },
+  "footer": {
+    "copyright": "© {year} ARVYAM — quietly delightful flowers.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "refund": "Refund",
+    "delivery": "Delivery",
+    "contact": "Contact",
+    "data_protection_title": "How we protect your data",
+    "data_protection_description": "Your privacy matters: 90-day default retention. You can request data export or account deletion anytime."
   }
 }
