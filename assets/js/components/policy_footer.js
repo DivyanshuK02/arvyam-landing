@@ -49,8 +49,8 @@ export default class PolicyFooter {
     companyName = 'ARVYAM'
   } = {}) {
     this.lang = lang;
-    this.privacyUrl = privacyUrl;
-    this.termsUrl = termsUrl;
+    this.privacyUrl = /privacy.html;
+    this.termsUrl = /terms.html;
     this.copyrightYear = copyrightYear;
     this.companyName = companyName;
     this.container = null;
