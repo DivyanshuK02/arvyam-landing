@@ -1,6 +1,6 @@
 /**
  * ARVYAM Main Application
- * Integration layer for Phase 2-3 components (Steps 1-5 complete)
+ * Integration layer for Phase 2-3 components (Steps 1-8 complete)
  * 
  * Constitutional Compliance:
  * - Selection Invariance: Always show exactly 3 equal-emphasis cards
@@ -9,7 +9,7 @@
  * - ARVY Persona: Calm, warm, editorial tone (no technical/browser messages to users)
  * - Privacy: No PII in logs, debounced analytics
  * 
- * @version 1.4.0 - Complete error copy guard (backend + browser + network)
+ * @version 1.8.0 - Step 8: LanguageSwitch (bilingual EN/HI toggle)
  */
 
 import { detectLanguage, setLanguage } from './i18n/lang_detect.js';
@@ -19,6 +19,7 @@ import IntentAssist from './intent_assist.js';
 import ResultCard from './components/result_card.js';
 import HintForm from './components/hint_form.js';
 import RefineBar from './components/refine_bar.js';
+import LanguageSwitch from './components/language_switch.js';
 
 // ============================================================================
 // Configuration
@@ -40,6 +41,7 @@ let consentBanner = null;
 let intentAssist = null;
 let hintForm = null;
 let refineBar = null;
+let languageSwitch = null;
 let analyticsEnabled = false;
 let uxTurns = 0; // Track user interaction depth
 
@@ -79,13 +81,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Step 6: Initialize RefineBar
     initializeRefineBar();
     
-    // Step 7: Cache DOM elements
+    // Step 7: Initialize LanguageSwitch (Step 8)
+    initializeLanguageSwitch();
+    
+    // Step 8: Cache DOM elements
     cacheDOMElements();
     
-    // Step 8: Set up global event listeners
+    // Step 9: Set up global event listeners
     setupGlobalListeners();
     
-    // Step 9: Initialize search functionality
+    // Step 10: Initialize search functionality
     if (searchForm && searchInput && resultsContainer) {
       initializeSearch();
     }
@@ -195,6 +200,34 @@ function initializeRefineBar() {
 }
 
 /**
+ * Initialize LanguageSwitch component (Step 8)
+ * Allows users to switch between languages (EN/HI) without page reload
+ * Updates all components simultaneously via language-change event
+ */
+function initializeLanguageSwitch() {
+  languageSwitch = new LanguageSwitch({
+    lang: currentLanguage,
+    languages: ['en', 'hi'],
+    ariaLabel: 'Select language'
+  });
+  
+  // Try to attach to dedicated container in header
+  const headerContainer = document.querySelector('.site-header__language');
+  
+  if (headerContainer) {
+    languageSwitch.attach(headerContainer);
+    console.log('[ARVYAM] LanguageSwitch attached to header');
+  } else {
+    // Fallback: Create floating switch (top-right)
+    const wrapper = document.createElement('div');
+    wrapper.className = 'language-switch-floating language-switch-floating--top-right';
+    document.body.appendChild(wrapper);
+    languageSwitch.attach(wrapper);
+    console.log('[ARVYAM] LanguageSwitch attached as floating element');
+  }
+}
+
+/**
  * Cache frequently accessed DOM elements
  */
 function cacheDOMElements() {
@@ -216,8 +249,8 @@ function cacheDOMElements() {
  * Set up global event listeners
  */
 function setupGlobalListeners() {
-  // Language change listener
-  window.addEventListener('language-changed', handleLanguageChange);
+  // Language change listener (from LanguageSwitch component - Step 8)
+  window.addEventListener('language-change', handleLanguageChange);
   
   // Consent change listener
   window.addEventListener('consent-changed', handleConsentChange);
@@ -233,29 +266,79 @@ function setupGlobalListeners() {
  * Handle language change event
  */
 async function handleLanguageChange(event) {
-  currentLanguage = event.detail.language;
-  console.log('[ARVYAM] Language changed to:', currentLanguage);
+  const { lang, previousLang } = event.detail;
   
-  // Update consent banner language if it exists
+  console.log(`[ARVYAM] Language changed: ${previousLang || 'unknown'} → ${lang}`);
+  
+  // Update current language
+  currentLanguage = lang;
+  
+  // Preload stringbanks for new language (with fallback)
+  try {
+    await preloadStringbanks([lang, 'en']);
+  } catch (error) {
+    console.warn('[ARVYAM] Failed to preload stringbanks:', error);
+    // Continue anyway - components will fall back to English
+  }
+  
+  // Update all components with new language
+  
+  // 1. ConsentBanner
   if (consentBanner && typeof consentBanner.updateLanguage === 'function') {
-    await consentBanner.updateLanguage(currentLanguage);
+    await consentBanner.updateLanguage(lang);
   }
   
-  // Update HintForm language if initialized
+  // 2. IntentAssist
+  if (intentAssist && typeof intentAssist.updateLanguage === 'function') {
+    await intentAssist.updateLanguage(lang);
+  }
+  
+  // 3. HintForm
   if (hintForm && typeof hintForm.updateLanguage === 'function') {
-    hintForm.updateLanguage(currentLanguage);
+    await hintForm.updateLanguage(lang);
   }
   
-  // Update RefineBar language if initialized
+  // 4. RefineBar
   if (refineBar && typeof refineBar.updateLanguage === 'function') {
-    refineBar.updateLanguage(currentLanguage);
+    await refineBar.updateLanguage(lang);
   }
   
-  // Re-render current results in new language if they exist
+  // 5. ResultCards (re-render existing cards if present)
   const existingCards = resultsContainer?.querySelectorAll('.result-card');
   if (existingCards && existingCards.length > 0) {
-    // Would re-render cards here, but for now just log
-    console.log('[ARVYAM] Cards would be re-rendered in new language');
+    // Re-render cards with new language
+    // This would need the card data to be stored globally
+    // For now, we'll just note that cards should implement updateLanguage
+    console.log('[ARVYAM] Note: ResultCards should implement updateLanguage() method');
+  }
+  
+  // 6. Update static UI text (search placeholder, CTA, etc.)
+  await updateStaticUIText(lang);
+}
+
+/**
+ * Update static UI text elements when language changes
+ * @param {string} lang - Language code
+ */
+async function updateStaticUIText(lang) {
+  try {
+    // Update search input placeholder
+    if (searchInput) {
+      const placeholder = await t('search.placeholder', lang);
+      searchInput.placeholder = placeholder;
+    }
+    
+    // Update search button text (if it exists and has text)
+    const searchButton = searchForm?.querySelector('button[type="submit"]');
+    if (searchButton) {
+      const ctaText = await t('search.cta', lang);
+      if (ctaText) searchButton.textContent = ctaText;
+    }
+    
+    // Add other static text updates as needed
+    
+  } catch (error) {
+    console.warn('[ARVYAM] Error updating static UI text:', error);
   }
 }
 
