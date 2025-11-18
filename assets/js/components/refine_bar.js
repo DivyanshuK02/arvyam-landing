@@ -11,7 +11,7 @@
  * Constitutional Compliance:
  * - Selection Invariance: Still returns 3 cards (triad enforced by backend)
  * - Guest-First: Simple language, optional refinement
- * - ARVY Persona: "We'll keep three options, just tuned" tone
+ * - ARVY Persona: "We will keep three options, just tuned" tone
  * - Privacy: PII blocked, no raw text logged
  * 
  * @module RefineBar
@@ -219,7 +219,7 @@ export default class RefineBar {
     this.helperElement = document.createElement('small');
     this.helperElement.id = 'refine-helper';
     this.helperElement.className = 'refine-bar__helper';
-    this.helperElement.textContent = 'We'll keep three options, just tuned. Max 50 characters.';
+    this.helperElement.textContent = 'We will keep three options, just tuned. Max 50 characters.';
     
     // Create error element
     this.errorElement = document.createElement('span');
