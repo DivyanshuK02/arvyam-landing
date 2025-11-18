@@ -4,7 +4,7 @@
  */
 
 // Supported languages
-const SUPPORTED_LANGUAGES = ['en', 'hi', 'ta', 'te', 'bn'];
+export const SUPPORTED_LANGUAGES = ['en', 'hi', 'ta', 'te', 'bn'];
 const DEFAULT_LANGUAGE = 'en';
 const STORAGE_KEY = 'arvyam_lang';
 
