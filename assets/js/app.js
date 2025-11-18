@@ -556,57 +556,104 @@ async function handleSearchSubmit(event) {
 }
 
 /**
+ * Normalize curate response to handle multiple API formats
+ * Backend may return: raw array, {arrangements: []}, or {results: []}
+ * Always returns {arrangements: []} or null
+ * 
+ * Constitutional: Enforces 2 MIX + 1 MONO triad invariance
+ * 
+ * @param {*} data - Response from /api/curate
+ * @returns {Object|null} Normalized {arrangements: []} or null
+ */
+function normalizeCurateResponse(data) {
+  let arrangements = null;
+
+  if (Array.isArray(data)) {
+    // API returns a raw triad array
+    arrangements = data;
+  } else if (data && Array.isArray(data.arrangements)) {
+    // API already wrapped in {arrangements: [...]}
+    arrangements = data.arrangements;
+  } else if (data && Array.isArray(data.results)) {
+    // Tolerate {results: [...]} for backwards compatibility
+    arrangements = data.results;
+  }
+
+  // Constitutional: Enforce exactly 3 arrangements (2 MIX + 1 MONO)
+  if (!arrangements || arrangements.length !== 3) {
+    console.error('[ARVYAM] Invalid curate response shape:', data);
+    console.error('[ARVYAM] Expected: Array of 3 items, got:', arrangements?.length || 'invalid');
+    return null;
+  }
+
+  return { arrangements };
+}
+
+/**
  * Call backend API to search arrangements
+ * Simple search with just a prompt (no hints)
+ * 
  * @param {string} query - User's search query
- * @returns {Promise<Object>} API response
+ * @returns {Promise<Object>} Normalized response with arrangements array
+ * @throws {Error} User-friendly error message
  */
 async function searchArrangements(query) {
-  const response = await fetch(`${API_BASE}/api/curate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ 
-      prompt: query,
-      language: currentLanguage 
-    })
-  });
-  
-  if (!response.ok) {
-    // Try to extract backend error message for developer logs only
-    let devMessage = null;
+  try {
+    const response = await fetch(`${API_BASE}/api/curate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        prompt: query,
+        language: currentLanguage 
+      })
+    });
     
-    try {
-      const data = await response.json();
-      if (data?.error?.message) {
-        devMessage = data.error.message;
+    if (!response.ok) {
+      // Try to extract backend error message for developer logs only
+      let devMessage = null;
+      
+      try {
+        const data = await response.json();
+        if (data?.error?.message) {
+          devMessage = data.error.message;
+        }
+      } catch (parseError) {
+        // Ignore JSON parse errors
       }
-    } catch (parseError) {
-      // Ignore JSON parse errors
+      
+      // Log backend error details for developers
+      if (devMessage) {
+        console.warn('[ARVYAM] API error:', devMessage);
+      }
+      
+      // CONSTITUTIONAL: Always surface canonical ARVY persona copy to guests
+      // Never show technical/backend messages directly to users
+      throw new Error('We could not complete your search. Please try again.');
     }
     
-    // Log backend error details for developers
-    if (devMessage) {
-      console.warn('[ARVYAM] API error:', devMessage);
+    const rawData = await response.json();
+    
+    // Normalize response shape (handles raw array or wrapped object)
+    const normalized = normalizeCurateResponse(rawData);
+    
+    if (!normalized) {
+      // Guest-facing ARVY persona message (constitutional requirement)
+      throw new Error('We could not complete your search. Please try again.');
     }
     
-    // CONSTITUTIONAL: Always surface canonical ARVY persona copy to guests
-    // Never show technical/backend messages directly to users
-    throw new Error('We couldn\'t complete your search. Please try again.');
-  }
-  
-  const data = await response.json();
-  
-  // Validate response structure
-  if (!data.arrangements || !Array.isArray(data.arrangements)) {
-    // Log technical detail for developers
-    console.error('[ARVYAM] Invalid curate response shape:', data);
+    return normalized;
+  } catch (error) {
+    // If it's already our formatted error, rethrow
+    if (error.message.includes('could not complete')) {
+      throw error;
+    }
     
-    // Guest-facing ARVY persona message (constitutional requirement)
-    throw new Error('We couldn\'t complete your search. Please try again.');
+    // Otherwise wrap in user-friendly message
+    console.error('[ARVYAM] Search error:', error);
+    throw new Error('We could not complete your search. Please try again.');
   }
-  
-  return data;
 }
 
 /**
@@ -685,19 +732,21 @@ async function searchWithHints(prompt, hints) {
       }
       
       // Guest-facing ARVY persona message (constitutional requirement)
-      throw new Error('We couldn\'t complete your search. Please try again.');
+      throw new Error('We could not complete your search. Please try again.');
     }
     
     const data = await response.json();
     
-    // Validate response
-    if (!data.arrangements || !Array.isArray(data.arrangements)) {
-      console.error('[ARVYAM] Invalid curate response shape:', data);
-      throw new Error('We couldn\'t complete your search. Please try again.');
+    // Normalize response shape (handles raw array or wrapped object)
+    const normalized = normalizeCurateResponse(data);
+    
+    if (!normalized) {
+      // Guest-facing ARVY persona message (constitutional requirement)
+      throw new Error('We could not complete your search. Please try again.');
     }
     
     // Display results
-    displayResults(data);
+    displayResults(normalized);
     
     // Track successful search with hints (safe fields only - NO raw text)
     trackEvent('search_with_hints_completed', {
