@@ -421,7 +421,7 @@ async function handleIntentClarified(event) {
       displayResults(results);
     } catch (error) {
       console.error('[ARVYAM] Search with intent error:', error);
-      showError('We couldn't complete your search. Please try again.');
+      showError('We could not complete your search. Please try again.');
     }
   }
 }
