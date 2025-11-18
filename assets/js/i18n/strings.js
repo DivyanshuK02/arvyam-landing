@@ -117,7 +117,7 @@ export async function t(key, lang = 'en', vars = {}) {
 
 /**
  * Synchronous translation function (requires stringbank to be preloaded)
- * Use this only when you're sure the stringbank is already loaded
+ * Use this only when you are sure the stringbank is already loaded
  * @param {string} key - Translation key in dot notation
  * @param {string} lang - Language code, defaults to 'en'
  * @param {Object} vars - Optional variables for string interpolation
