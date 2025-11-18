@@ -488,7 +488,7 @@ async function handleSearchSubmit(event) {
   
   // Validation
   if (!query) {
-    showFieldError('Please describe what you're celebrating.');
+    showFieldError('Please describe what you are celebrating.');
     searchInput.focus();
     return;
   }
@@ -627,7 +627,7 @@ async function searchArrangements(query) {
  */
 async function searchWithHints(prompt, hints) {
   if (!prompt) {
-    showFieldError('Please describe what you're celebrating.');
+    showFieldError('Please describe what you are celebrating.');
     return;
   }
   
@@ -847,7 +847,7 @@ async function displayResults(data) {
     console.error(
       `[ARVYAM] Backend triad violation: expected 3 arrangements, got ${arrangements.length}`
     );
-    showError('We couldn't complete your curation just now. Please try again.');
+    showError('We could not complete your curation just now. Please try again.');
     
     trackEvent('backend_triad_violation', {
       arrangements_returned: arrangements.length,
@@ -886,7 +886,7 @@ async function displayResults(data) {
       { requested: arrangements.length, rendered: validCards.length }
     );
     
-    showError('We couldn't complete your curation just now. Please try again.');
+    showError('We could not complete your curation just now. Please try again.');
     
     trackEvent('triad_violation', {
       result_count: validCards.length,
