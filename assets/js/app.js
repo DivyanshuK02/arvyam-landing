@@ -137,7 +137,7 @@ async function initializeConsentBanner() {
   
   // Show banner only if consent hasn't been given
   if (!consentBanner.hasConsent()) {
-    consentBanner.show();
+    await consentBanner.show();
   } else {
     // Check if analytics should be enabled
     const consent = consentBanner.getConsent();
