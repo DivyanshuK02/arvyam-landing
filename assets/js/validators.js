@@ -5,7 +5,7 @@
  * Constitutional Compliance:
  * - Privacy: Strict PII detection (email, phone, name context)
  * - Guest-First: Calm, helpful error messages (no technical jargon)
- * - ARVY Persona: "We'll ask for contact details later" tone
+ * - ARVY Persona: "We will ask for contact details later" tone
  * 
  * Reusable by: HintForm (tone_hint), RefineBar (refinement input)
  * 
@@ -83,7 +83,7 @@ export const PII_PATTERNS = {
  * 
  * @example
  * validateToneHint("contact me at user@email.com")
- * // => { valid: false, error: "Please don't include email addresses..." }
+ * // => { valid: false, error: "Please do not include email addresses..." }
  */
 export function validateToneHint(value) {
   // Handle null/undefined
@@ -113,7 +113,7 @@ export function validateToneHint(value) {
   if (PII_PATTERNS.email.test(trimmed)) {
     return { 
       valid: false, 
-      error: "Please don't include email addresses. We'll ask for contact details later." 
+      error: "Please do not include email addresses. We will ask for contact details later." 
     };
   }
   
@@ -121,7 +121,7 @@ export function validateToneHint(value) {
   if (PII_PATTERNS.phone.test(trimmed)) {
     return { 
       valid: false, 
-      error: "Please don't include phone numbers. We'll ask for contact details later." 
+      error: "Please do not include phone numbers. We will ask for contact details later." 
     };
   }
   
@@ -192,14 +192,14 @@ export function validateRefinement(value) {
   if (PII_PATTERNS.email.test(trimmed)) {
     return { 
       valid: false, 
-      error: "Please don't include email addresses." 
+      error: "Please do not include email addresses." 
     };
   }
   
   if (PII_PATTERNS.phone.test(trimmed)) {
     return { 
       valid: false, 
-      error: "Please don't include phone numbers." 
+      error: "Please do not include phone numbers." 
     };
   }
   
