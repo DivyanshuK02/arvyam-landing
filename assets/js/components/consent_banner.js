@@ -5,7 +5,7 @@
  * Supports granular consent options, i18n, keyboard navigation, and focus management.
  *
  * @module ConsentBanner
- * @version 1.0.1
+ * @version 1.0.2 - Fixed async translation rendering
  */
 
 import { t } from '../i18n/strings.js';
@@ -43,7 +43,8 @@ export default class ConsentBanner {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleLanguageChange = this.handleLanguageChange.bind(this);
 
-    // Listen for language changes
+    // Listen for language changes (support both event names)
+    window.addEventListener('language-change', this.handleLanguageChange);
     window.addEventListener('language-changed', this.handleLanguageChange);
   }
 
@@ -51,12 +52,12 @@ export default class ConsentBanner {
    * Handle language change events
    * @param {CustomEvent} event - Language change event
    */
-  handleLanguageChange(event) {
+  async handleLanguageChange(event) {
     this.currentLanguage = event.detail.language;
     // Re-render modal if it's currently shown
     if (this.modal && document.body.contains(this.modal)) {
       this.hide();
-      this.show();
+      await this.show();
     }
   }
 
@@ -142,7 +143,7 @@ export default class ConsentBanner {
   /**
    * Show the consent banner
    */
-  show() {
+  async show() {
     // Don't show if consent already exists
     if (this.hasConsent()) {
       console.log('[ConsentBanner] Consent already given, skipping modal');
@@ -152,8 +153,8 @@ export default class ConsentBanner {
     // Store currently focused element
     this.focusedElementBeforeOpen = document.activeElement;
 
-    // Create modal
-    this.createModal();
+    // Create modal (await translations)
+    await this.createModal();
 
     // Add to DOM
     document.body.appendChild(this.overlay);
@@ -246,7 +247,7 @@ export default class ConsentBanner {
   /**
    * Create modal HTML structure
    */
-  createModal() {
+  async createModal() {
     // Create overlay
     this.overlay = document.createElement('div');
     this.overlay.className = 'consent-overlay';
@@ -276,19 +277,19 @@ export default class ConsentBanner {
     const title = document.createElement('h2');
     title.id = 'consent-title';
     title.className = 'consent-title';
-    title.textContent = t('consent.title');
+    title.textContent = await t('consent.title', this.currentLanguage);
 
     // Explanation
     const explanation = document.createElement('p');
     explanation.id = 'consent-explanation';
     explanation.className = 'consent-explanation';
-    explanation.textContent = t('consent.explanation');
+    explanation.textContent = await t('consent.explanation', this.currentLanguage);
 
     // Checkbox group (initially hidden in simple mode)
-    const checkboxGroup = this.createCheckboxGroup();
+    const checkboxGroup = await this.createCheckboxGroup();
 
     // Buttons
-    const buttons = this.createButtons();
+    const buttons = await this.createButtons();
 
     // Assemble card
     card.appendChild(closeButton);
@@ -305,17 +306,25 @@ export default class ConsentBanner {
    * Create checkbox group for granular consent
    * @returns {HTMLElement} Checkbox group element
    */
-  createCheckboxGroup() {
+  async createCheckboxGroup() {
     const group = document.createElement('div');
     group.className = 'consent-checkbox-group';
     group.style.display = 'none'; // Hidden by default
+
+    // Fetch all translations at once
+    const [functionalLabel, functionalDesc, analyticsLabel, analyticsDesc] = await Promise.all([
+      t('consent.functional', this.currentLanguage),
+      t('consent.functionalDesc', this.currentLanguage),
+      t('consent.analytics', this.currentLanguage),
+      t('consent.analyticsDesc', this.currentLanguage),
+    ]);
 
     // Functional cookies (required, disabled)
     const functionalItem = this.createCheckboxItem({
       id: 'consent-functional',
       name: 'functional',
-      label: t('consent.functional'),
-      description: t('consent.functionalDesc'),
+      label: functionalLabel,
+      description: functionalDesc,
       checked: true,
       disabled: true,
       required: true
@@ -325,8 +334,8 @@ export default class ConsentBanner {
     const analyticsItem = this.createCheckboxItem({
       id: 'consent-analytics',
       name: 'analytics',
-      label: t('consent.analytics'),
-      description: t('consent.analyticsDesc'),
+      label: analyticsLabel,
+      description: analyticsDesc,
       checked: false,
       disabled: false,
       required: false
@@ -401,29 +410,36 @@ export default class ConsentBanner {
    * Create button group
    * @returns {HTMLElement} Button group element
    */
-  createButtons() {
+  async createButtons() {
     const container = document.createElement('div');
     container.className = 'consent-buttons';
+
+    // Fetch all button translations at once
+    const [acceptText, rejectText, customizeText] = await Promise.all([
+      t('consent.acceptAll', this.currentLanguage),
+      t('consent.rejectNonEssential', this.currentLanguage),
+      t('consent.customize', this.currentLanguage),
+    ]);
 
     // Accept All button
     const acceptAll = document.createElement('button');
     acceptAll.className = 'consent-btn consent-btn-primary';
-    acceptAll.textContent = t('consent.acceptAll');
-    acceptAll.setAttribute('aria-label', t('consent.acceptAll'));
+    acceptAll.textContent = acceptText;
+    acceptAll.setAttribute('aria-label', acceptText);
     acceptAll.addEventListener('click', () => this.handleAcceptAll());
 
     // Reject Non-Essential button
     const rejectNonEssential = document.createElement('button');
     rejectNonEssential.className = 'consent-btn consent-btn-secondary';
-    rejectNonEssential.textContent = t('consent.rejectNonEssential');
-    rejectNonEssential.setAttribute('aria-label', t('consent.rejectNonEssential'));
+    rejectNonEssential.textContent = rejectText;
+    rejectNonEssential.setAttribute('aria-label', rejectText);
     rejectNonEssential.addEventListener('click', () => this.handleRejectNonEssential());
 
     // Customize button
     const customize = document.createElement('button');
     customize.className = 'consent-btn consent-btn-tertiary';
-    customize.textContent = t('consent.customize');
-    customize.setAttribute('aria-label', t('consent.customize'));
+    customize.textContent = customizeText;
+    customize.setAttribute('aria-label', customizeText);
     customize.addEventListener('click', () => this.handleCustomize());
 
     container.appendChild(acceptAll);
@@ -458,7 +474,7 @@ export default class ConsentBanner {
   /**
    * Handle "Customize" button click
    */
-  handleCustomize() {
+  async handleCustomize() {
     if (this.isCustomizeMode) return;
 
     this.isCustomizeMode = true;
@@ -476,8 +492,11 @@ export default class ConsentBanner {
 
       const savePreferences = document.createElement('button');
       savePreferences.className = 'consent-btn consent-btn-primary consent-btn-full';
-      savePreferences.textContent = t('consent.savePreferences');
-      savePreferences.setAttribute('aria-label', t('consent.savePreferences'));
+      
+      // Fetch translation for save button
+      const saveText = await t('consent.savePreferences', this.currentLanguage);
+      savePreferences.textContent = saveText;
+      savePreferences.setAttribute('aria-label', saveText);
       savePreferences.addEventListener('click', () => this.handleSavePreferences());
 
       buttonContainer.appendChild(savePreferences);
@@ -502,10 +521,35 @@ export default class ConsentBanner {
   }
 
   /**
+   * Public API: Update language and re-render modal if shown
+   * Used by app.js for language switching
+   * @param {string} lang - Language code
+   */
+  async updateLanguage(lang) {
+    this.currentLanguage = lang;
+    if (this.modal && document.body.contains(this.modal)) {
+      this.hide();
+      await this.show();
+    }
+  }
+
+  /**
+   * Public API: Open the manage view (customize mode)
+   * Used by PolicyFooter for "Cookie Settings" link
+   */
+  async openManageView() {
+    await this.show();
+    if (this.modal && document.body.contains(this.modal)) {
+      await this.handleCustomize();
+    }
+  }
+
+  /**
    * Destroy the banner and clean up
    */
   destroy() {
     this.hide();
+    window.removeEventListener('language-change', this.handleLanguageChange);
     window.removeEventListener('language-changed', this.handleLanguageChange);
   }
 }
