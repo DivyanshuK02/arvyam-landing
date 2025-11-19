@@ -192,17 +192,17 @@ export default class RefineBar {
     // Create title
     const title = document.createElement('h3');
     title.className = 'refine-bar__title';
-    title.textContent = 'Want to gently adjust these three?';
+    title.textContent = 'Adjust the selection';
     
     // Create form group
     const formGroup = document.createElement('div');
     formGroup.className = 'refine-bar__form-group';
     
-    // Create label
+    // Create label (visually hidden, for a11y)
     const label = document.createElement('label');
     label.htmlFor = 'refine-input';
-    label.className = 'refine-bar__label';
-    label.textContent = 'How should we tweak the selection?';
+    label.className = 'refine-bar__label sr-only';
+    label.textContent = 'Adjustment preferences';
     
     // Create input
     this.input = document.createElement('input');
@@ -210,16 +210,17 @@ export default class RefineBar {
     this.input.id = 'refine-input';
     this.input.name = 'refinement';
     this.input.className = 'refine-bar__input';
-    this.input.placeholder = 'E.g., "more vibrant colors" or "smaller budget"';
+    this.input.placeholder = 'E.g., warmer colors • softer palette';
     this.input.maxLength = 50;
-    this.input.setAttribute('aria-describedby', 'refine-helper refine-error');
+    this.input.setAttribute('aria-describedby', 'refine-error');
     this.input.setAttribute('aria-required', 'true');
     
-    // Create helper text
+    // Create helper text (hidden - length limit shown via inline counter only when needed)
     this.helperElement = document.createElement('small');
     this.helperElement.id = 'refine-helper';
     this.helperElement.className = 'refine-bar__helper';
-    this.helperElement.textContent = 'We will keep three options, just tuned. Max 50 characters.';
+    this.helperElement.style.display = 'none'; // Hidden by default
+    this.helperElement.textContent = '';
     
     // Create error element
     this.errorElement = document.createElement('span');
@@ -232,7 +233,7 @@ export default class RefineBar {
     this.submitButton = document.createElement('button');
     this.submitButton.type = 'submit';
     this.submitButton.className = 'refine-bar__submit btn btn-primary tap-target';
-    this.submitButton.textContent = 'Refine results';
+    this.submitButton.textContent = 'Refine';
     this.submitButton.setAttribute('aria-label', 'Refine search results');
     
     // Assemble DOM
