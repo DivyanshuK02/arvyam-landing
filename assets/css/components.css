@@ -41,6 +41,122 @@
   --card-transition: all 0.2s ease-in-out;
 }
 
+/* ========================================================================
+   Button System (A4: Unified CTA Styles)
+   ======================================================================== */
+
+/**
+ * Unified button system for all CTAs across the site
+ * Variants: primary, secondary, ghost
+ * Sizes: lg (hero), md (general), sm (minor)
+ */
+
+/* Base button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* WCAG touch target minimum */
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-family: "Lora", Georgia, serif;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  transition: all 200ms ease;
+  white-space: nowrap;
+}
+
+/* Focus state (WCAG 2.1 AA) */
+.btn:focus-visible {
+  outline: 2px solid var(--cta-focus-ring, #10b981);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+/* Variants */
+.btn--primary {
+  background: var(--cta-bg, #059669);
+  color: var(--cta-text, #ffffff);
+}
+
+.btn--primary:hover {
+  background: var(--cta-bg-hover, #047857);
+}
+
+.btn--primary:active {
+  background: var(--cta-bg-active, #065f46);
+  transform: translateY(1px);
+}
+
+.btn--secondary {
+  background: var(--card-bg, #ffffff);
+  color: var(--card-text-primary, #111827);
+  border: 1px solid var(--card-border, #e5e7eb);
+}
+
+.btn--secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.btn--secondary:active {
+  background: #f3f4f6;
+  transform: translateY(1px);
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--card-border, #e5e7eb);
+  color: var(--card-text-primary, #111827);
+}
+
+.btn--ghost:hover {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: #d1d5db;
+}
+
+.btn--ghost:active {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(1px);
+}
+
+/* Sizes */
+.btn--lg {
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+}
+
+.btn--md {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9375rem;
+  min-height: 44px;
+}
+
+.btn--sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  min-height: 36px;
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}
+
 /* ========================================
    Result Card Base Styles
    ======================================== */
@@ -1293,6 +1409,88 @@
   
   .policy-footer__copyright {
     color: var(--card-text-muted-dark, #6b7280);
+  }
+}
+
+/* ========================================================================
+   Language Pill Styles (A3: Footer-Right)
+   ======================================================================== */
+
+/**
+ * Language pill - Simple English | हिंदी toggle
+ * Positioned in footer-right on desktop, inline on mobile
+ */
+
+.lang-pill {
+  position: sticky;
+  right: 24px;
+  bottom: 24px;
+  margin-left: auto;
+  display: inline-flex;
+  z-index: 10;
+  line-height: 1;
+}
+
+.lang-pill__btn {
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  font-family: "Lora", Georgia, serif;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.lang-pill__btn:hover {
+  background: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.lang-pill__btn:focus-visible {
+  outline: 2px solid rgba(43, 43, 43, 0.75);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(230, 177, 126, 0.28);
+}
+
+.lang-pill__btn:active {
+  transform: translateY(1px);
+}
+
+.lang-pill__sep {
+  opacity: 0.5;
+  margin: 0 0.25rem;
+}
+
+.lang-pill__active {
+  color: var(--accent, #E6B17E);
+  font-weight: 700;
+}
+
+/* Mobile: keep inline within footer, no sticky positioning */
+@media (max-width: 640px) {
+  .lang-pill {
+    position: static;
+    right: auto;
+    bottom: auto;
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+  
+  .lang-pill__btn {
+    font-size: 12px;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .lang-pill__btn {
+    transition: none;
   }
 }
 
