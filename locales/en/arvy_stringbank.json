@@ -10,7 +10,8 @@
     "title": "{name}",
     "subtitle": "{occasion}",
     "description": "{description}",
-    "cta": "See details",
+    "cta": "Buy",
+    "price_label": "₹{price}",
     "image_alt": "{name} bouquet"
   },
   "common": {
@@ -47,9 +48,9 @@
     "submit": "Continue with these details"
   },
   "refine": {
-    "title": "Want to adjust these selections?",
-    "helper": "Tell us how to adjust, and we will update your selections.",
-    "placeholder": "E.g., 'more vibrant colors' or 'softer palette'",
+    "title": "Adjust the selection",
+    "helper": "",
+    "placeholder": "E.g., warmer colors • softer palette",
     "button": "Refine",
     "counter": "{turn} / {max}",
     "max": "You have reached {max} refinements. These are the best-matching options we can offer today.",
