@@ -86,6 +86,14 @@ export default class ResultCard {
         ? Promise.resolve(this.data.imageAlt)
         : t('result.image_alt', this.options.lang, { name: this.data.name })
     ]);
+    
+    // Get price if available (A1: price display)
+    let priceHtml = '';
+    if (this.data.price_inr != null && this.data.price_inr > 0) {
+      const formattedPrice = this.data.price_inr.toLocaleString('en-IN');
+      const priceLabel = await t('result.price_label', this.options.lang, { price: formattedPrice });
+      priceHtml = `<p class="result-card__price">${this.escapeHtml(priceLabel)}</p>`;
+    }
 
     // SPEC COMPLIANT: Simple <img> with WebP only, width/height attributes
     card.innerHTML = `
@@ -108,6 +116,8 @@ export default class ResultCard {
         <p class="result-card__subtitle">
           ${this.escapeHtml(subtitle)}
         </p>
+        
+        ${priceHtml}
 
         <p class="result-card__description">
           ${this.escapeHtml(description)}
@@ -263,16 +273,25 @@ export default class ResultCard {
         ? Promise.resolve(this.data.imageAlt)
         : t('result.image_alt', lang, { name: this.data.name })
     ]);
+    
+    // Get price translation if available (A1: price display)
+    let priceText = '';
+    if (this.data.price_inr != null && this.data.price_inr > 0) {
+      const formattedPrice = this.data.price_inr.toLocaleString('en-IN');
+      priceText = await t('result.price_label', lang, { price: formattedPrice });
+    }
 
     // Update text content
     const titleEl = this.element.querySelector('.result-card__title');
     const subtitleEl = this.element.querySelector('.result-card__subtitle');
+    const priceEl = this.element.querySelector('.result-card__price');
     const descEl = this.element.querySelector('.result-card__description');
     const ctaEl = this.element.querySelector('.result-card__cta');
     const imgEl = this.element.querySelector('.result-card__image');
 
     if (titleEl) titleEl.textContent = title;
     if (subtitleEl) subtitleEl.textContent = subtitle;
+    if (priceEl && priceText) priceEl.textContent = priceText;
     if (descEl) descEl.textContent = description;
     if (ctaEl) {
       ctaEl.textContent = ctaText;
