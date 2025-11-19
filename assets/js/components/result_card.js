@@ -87,12 +87,17 @@ export default class ResultCard {
         : t('result.image_alt', this.options.lang, { name: this.data.name })
     ]);
     
-    // Get price if available (A1: price display)
+    // Get price if available (A1: price display - robust fallback)
     let priceHtml = '';
-    if (this.data.price_inr != null && this.data.price_inr > 0) {
-      const formattedPrice = this.data.price_inr.toLocaleString('en-IN');
-      const priceLabel = await t('result.price_label', this.options.lang, { price: formattedPrice });
-      priceHtml = `<p class="result-card__price">${this.escapeHtml(priceLabel)}</p>`;
+    const price = this.data.price_inr ?? this.data.price; // Fallback to 'price' field
+    if (price != null && price > 0) {
+      // Use Intl.NumberFormat for proper currency formatting
+      const formatted = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0
+      }).format(price);
+      priceHtml = `<p class="result-card__price">${this.escapeHtml(formatted)}</p>`;
     }
 
     // SPEC COMPLIANT: Simple <img> with WebP only, width/height attributes
@@ -274,11 +279,15 @@ export default class ResultCard {
         : t('result.image_alt', lang, { name: this.data.name })
     ]);
     
-    // Get price translation if available (A1: price display)
+    // Get price translation if available (A1: price display - robust fallback)
     let priceText = '';
-    if (this.data.price_inr != null && this.data.price_inr > 0) {
-      const formattedPrice = this.data.price_inr.toLocaleString('en-IN');
-      priceText = await t('result.price_label', lang, { price: formattedPrice });
+    const price = this.data.price_inr ?? this.data.price;
+    if (price != null && price > 0) {
+      priceText = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0
+      }).format(price);
     }
 
     // Update text content
