@@ -138,6 +138,8 @@
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 8px rgba(230, 177, 126, 0.3);
+  opacity: 1; /* A2: Ensure full visibility - no fade */
+  filter: none; /* A2: Remove any blur filter */
 }
 
 .refine-bar__submit:hover {
@@ -161,6 +163,7 @@
   color: #9CA3AF;
   cursor: not-allowed;
   box-shadow: none;
+  opacity: 0.6; /* Only reduce opacity when disabled */
 }
 
 /* ============================================================================
