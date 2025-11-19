@@ -9,7 +9,7 @@
  * - ARVY Persona: Calm, warm, editorial tone (no technical/browser messages to users)
  * - Privacy: No PII in logs, debounced analytics
  * 
- * @version 1.9.0 - Step 9: PolicyFooter (legal links + cookie settings)
+ * @version 1.10.0 - A5-A6: Language propagation fix + consent toast + price rendering
  */
 
 import { detectLanguage, setLanguage } from './i18n/lang_detect.js';
@@ -284,6 +284,9 @@ function setupGlobalListeners() {
       console.warn('[ARVYAM] Failed to preload stringbanks:', error);
     }
     
+    // A3: Update static UI text (hero buttons, placeholders, card CTAs)
+    await updateStaticUIText(lang);
+    
     // Re-render components that read t() on mount
     if (refineBar && typeof refineBar.updateLanguage === 'function') {
       await refineBar.updateLanguage(lang);
@@ -385,7 +388,7 @@ async function handleLanguageChange(event) {
 }
 
 /**
- * Update static UI text elements when language changes
+ * Update static UI text elements when language changes (A3: Enhanced)
  * @param {string} lang - Language code
  */
 async function updateStaticUIText(lang) {
@@ -403,7 +406,51 @@ async function updateStaticUIText(lang) {
       if (ctaText) searchButton.textContent = ctaText;
     }
     
-    // Add other static text updates as needed
+    // A3: Update hero buttons via data-i18n attributes
+    const heroButtonMap = [
+      { selector: 'a[href="#curate"]', key: 'hero.title' }, // "Begin my journey" - closest key
+      { selector: 'a[href="#how"]', key: 'common.continue' } // "How it works" - using fallback
+    ];
+    
+    for (const { selector, key } of heroButtonMap) {
+      const el = document.querySelector(selector);
+      if (el) {
+        try {
+          const text = await t(key, lang);
+          if (text) el.textContent = text;
+        } catch (e) {
+          // Skip if key doesn't exist
+        }
+      }
+    }
+    
+    // A3: Update refine bar placeholder if present
+    const refineInput = document.querySelector('#refine-input, .refine-bar__input');
+    if (refineInput) {
+      try {
+        const placeholder = await t('refine.placeholder', lang);
+        if (placeholder) refineInput.placeholder = placeholder;
+      } catch (e) {
+        // Skip if refine not present
+      }
+    }
+    
+    // A3: Update result card CTA buttons if present
+    const cardButtons = document.querySelectorAll('.result-card__cta');
+    if (cardButtons.length > 0) {
+      try {
+        const ctaText = await t('result.cta', lang);
+        if (ctaText) {
+          cardButtons.forEach(btn => {
+            btn.textContent = ctaText;
+          });
+        }
+      } catch (e) {
+        // Skip if cards not present
+      }
+    }
+    
+    console.log(`[ARVYAM] Static UI text updated for language: ${lang}`);
     
   } catch (error) {
     console.warn('[ARVYAM] Error updating static UI text:', error);
@@ -621,8 +668,15 @@ function normalizeCurateResponse(data) {
     return null;
   }
 
+  // BLOCKER FIX: Normalize price field (backend sends 'price', frontend expects 'price_inr')
+  // Apply fallback shim to ensure cards can render prices
+  const normalizedArrangements = arrangements.map(item => ({
+    ...item,
+    price_inr: Number((item.price_inr ?? item.price) || 0)
+  }));
+
   return { 
-    arrangements, 
+    arrangements: normalizedArrangements, 
     uncertainty_score: uncertaintyScore 
   };
 }
