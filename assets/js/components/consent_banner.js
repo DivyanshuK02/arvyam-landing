@@ -5,7 +5,7 @@
  * Supports granular consent options, i18n, keyboard navigation, and focus management.
  *
  * @module ConsentBanner
- * @version 1.0.2 - Fixed async translation rendering
+ * @version 2.0.0 - A5: Toast butter-bar pattern (first visit) + modal customize
  */
 
 import { t } from '../i18n/strings.js';
@@ -29,10 +29,12 @@ export default class ConsentBanner {
   constructor(options = {}) {
     this.options = {
       onConsentChange: options.onConsentChange || null,
+      uiMode: options.uiMode || 'toast-first-run', // 'toast-first-run' | 'modal-always'
     };
 
     this.overlay = null;
     this.modal = null;
+    this.toast = null; // A5: Toast element for butter-bar pattern
     this.focusedElementBeforeOpen = null;
     this.isCustomizeMode = false;
     this.currentLanguage = detectLanguage();
@@ -46,6 +48,14 @@ export default class ConsentBanner {
     // Listen for language changes (support both event names)
     window.addEventListener('language-change', this.handleLanguageChange);
     window.addEventListener('language-changed', this.handleLanguageChange);
+    // A5: Also listen for arvy:language event
+    document.addEventListener('arvy:language', (e) => {
+      this.currentLanguage = e.detail?.lang || 'en';
+      if (this.modal && document.body.contains(this.modal)) {
+        this.hide();
+        this.show();
+      }
+    });
   }
 
   /**
@@ -142,14 +152,24 @@ export default class ConsentBanner {
 
   /**
    * Show the consent banner
+   * A5: Toast pattern for first visit, modal on customize
    */
   async show() {
     // Don't show if consent already exists
     if (this.hasConsent()) {
-      console.log('[ConsentBanner] Consent already given, skipping modal');
+      console.log('[ConsentBanner] Consent already given, skipping banner');
       return;
     }
 
+    // A5: Show toast for first-run, modal if mode is set to modal-always
+    if (this.options.uiMode === 'toast-first-run') {
+      await this.createToast();
+      document.body.appendChild(this.toast);
+      console.log('[ConsentBanner] Toast banner shown (first visit)');
+      return;
+    }
+
+    // Fallback: Traditional modal mode
     // Store currently focused element
     this.focusedElementBeforeOpen = document.activeElement;
 
@@ -173,9 +193,17 @@ export default class ConsentBanner {
   }
 
   /**
-   * Hide the consent banner
+   * Hide the consent banner (A5: handles both toast and modal)
    */
   hide() {
+    // A5: Hide toast if present
+    if (this.toast && document.body.contains(this.toast)) {
+      document.body.removeChild(this.toast);
+      this.toast = null;
+      console.log('[ConsentBanner] Toast hidden');
+    }
+
+    // Hide modal if present
     if (this.overlay && document.body.contains(this.overlay)) {
       // Remove from DOM
       document.body.removeChild(this.overlay);
@@ -195,6 +223,8 @@ export default class ConsentBanner {
       this.overlay = null;
       this.modal = null;
       this.isCustomizeMode = false;
+      
+      console.log('[ConsentBanner] Modal hidden');
     }
   }
 
@@ -300,6 +330,72 @@ export default class ConsentBanner {
 
     this.modal.appendChild(card);
     this.overlay.appendChild(this.modal);
+  }
+
+  /**
+   * Create toast banner for first-run consent (A5: Butter-bar pattern)
+   * Compact bottom-right toast with Accept/Reject/Customize buttons
+   * @returns {Promise<void>}
+   */
+  async createToast() {
+    // Fetch all translations
+    const [title, msg, acceptText, rejectText, customizeText] = await Promise.all([
+      t('consent.title', this.currentLanguage),
+      t('consent.explanation', this.currentLanguage),
+      t('consent.acceptAll', this.currentLanguage),
+      t('consent.rejectNonEssential', this.currentLanguage),
+      t('consent.customize', this.currentLanguage),
+    ]);
+
+    // Create toast container
+    const wrap = document.createElement('div');
+    wrap.className = 'consent-toast';
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-live', 'polite');
+    wrap.setAttribute('aria-label', title);
+
+    // Build toast card
+    wrap.innerHTML = `
+      <div class="consent-toast__card">
+        <div class="consent-toast__title">${this.escapeHtml(title)}</div>
+        <div class="consent-toast__msg">${this.escapeHtml(msg)}</div>
+        <div class="consent-toast__actions">
+          <button class="btn btn--primary btn--sm" data-act="accept" type="button">${this.escapeHtml(acceptText)}</button>
+          <button class="btn btn--secondary btn--sm" data-act="reject" type="button">${this.escapeHtml(rejectText)}</button>
+          <button class="btn btn--ghost btn--sm" data-act="customize" type="button">${this.escapeHtml(customizeText)}</button>
+        </div>
+      </div>
+    `;
+
+    // Wire up event handlers
+    wrap.querySelector('[data-act="accept"]').addEventListener('click', () => this.handleAcceptAll());
+    wrap.querySelector('[data-act="reject"]').addEventListener('click', () => this.handleRejectNonEssential());
+    wrap.querySelector('[data-act="customize"]').addEventListener('click', async () => {
+      // Transition: toast → modal (for granular control)
+      this.hide(); // Remove toast
+      this.focusedElementBeforeOpen = document.activeElement;
+      await this.createModal();
+      document.body.appendChild(this.overlay);
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', this.handleKeyDown);
+      
+      // Immediately open customize mode
+      await this.handleCustomize();
+    });
+
+    this.toast = wrap;
+  }
+
+  /**
+   * Escape HTML to prevent XSS
+   * @param {string} str - String to escape
+   * @returns {string} Escaped string
+   */
+  escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   /**
