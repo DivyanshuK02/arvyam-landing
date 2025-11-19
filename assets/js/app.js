@@ -83,11 +83,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Step 6: Initialize RefineBar
     initializeRefineBar();
     
-    // Step 7: Initialize LanguageSwitch (Step 8)
-    initializeLanguageSwitch();
-    
-    // Step 8: Initialize PolicyFooter (Step 9)
+    // Step 7: Initialize PolicyFooter (Step 9) - MUST be before LanguageSwitch
     await initializePolicyFooter();
+    
+    // Step 8: Initialize LanguageSwitch (A3: Footer-right pill)
+    initializeLanguageSwitch();
     
     // Step 9: Cache DOM elements
     cacheDOMElements();
@@ -205,31 +205,23 @@ function initializeRefineBar() {
 }
 
 /**
- * Initialize LanguageSwitch component (Step 8)
- * Allows users to switch between languages (EN/HI) without page reload
- * Updates all components simultaneously via language-change event
+ * Initialize LanguageSwitch component (A3: Footer-right pill)
+ * Mounts a simple English | हिंदी toggle in the footer
+ * Updates all components simultaneously via arvy:language event
  */
 function initializeLanguageSwitch() {
   languageSwitch = new LanguageSwitch({
     lang: currentLanguage,
-    languages: ['en', 'hi'],
-    ariaLabel: 'Select language'
+    anchorSelector: '#policy-footer',
+    onChange: (lang) => {
+      console.log(`[ARVYAM] Language switched to: ${lang}`);
+    }
   });
   
-  // Try to attach to dedicated container in header
-  const headerContainer = document.querySelector('.site-header__language');
+  // Mount into footer (must be called AFTER policy footer is mounted)
+  languageSwitch.mount();
   
-  if (headerContainer) {
-    languageSwitch.attach(headerContainer);
-    console.log('[ARVYAM] LanguageSwitch attached to header');
-  } else {
-    // Fallback: Create floating switch (top-right)
-    const wrapper = document.createElement('div');
-    wrapper.className = 'language-switch-floating language-switch-floating--top-right';
-    document.body.appendChild(wrapper);
-    languageSwitch.attach(wrapper);
-    console.log('[ARVYAM] LanguageSwitch attached as floating element');
-  }
+  console.log('[ARVYAM] LanguageSwitch mounted to footer');
 }
 
 /**
@@ -275,6 +267,43 @@ function cacheDOMElements() {
 function setupGlobalListeners() {
   // Language change listener (from LanguageSwitch component - Step 8)
   window.addEventListener('language-change', handleLanguageChange);
+  
+  // A3: Listen for arvy:language event (from footer-right pill)
+  document.addEventListener('arvy:language', async (e) => {
+    const lang = e.detail?.lang || 'en';
+    console.log(`[ARVYAM] arvy:language event received: ${lang}`);
+    
+    // Update current language
+    currentLanguage = lang;
+    setLanguage(lang); // i18n helper
+    
+    // Preload stringbanks
+    try {
+      await preloadStringbanks([lang, 'en']);
+    } catch (error) {
+      console.warn('[ARVYAM] Failed to preload stringbanks:', error);
+    }
+    
+    // Re-render components that read t() on mount
+    if (refineBar && typeof refineBar.updateLanguage === 'function') {
+      await refineBar.updateLanguage(lang);
+    }
+    
+    if (policyFooter && typeof policyFooter.updateLanguage === 'function') {
+      await policyFooter.updateLanguage(lang);
+    }
+    
+    if (consentBanner && typeof consentBanner.updateLanguage === 'function') {
+      await consentBanner.updateLanguage(lang);
+    }
+    
+    // Re-render result cards if present
+    const existingCards = resultsContainer?.querySelectorAll('.result-card');
+    if (existingCards && existingCards.length > 0) {
+      // Cards already have updateLanguage method (from A1)
+      console.log(`[ARVYAM] Re-rendering ${existingCards.length} result cards`);
+    }
+  });
   
   // Consent change listener
   window.addEventListener('consent-changed', handleConsentChange);
@@ -534,11 +563,6 @@ async function handleSearchSubmit(event) {
     // Show if uncertainty_score > 0.5 (uncertain prompt)
     const uncertaintyScore = results.uncertainty_score ?? 0;
     
-    // Log warning if API didn't return uncertainty_score
-    if (results.uncertainty_score === undefined || results.uncertainty_score === null) {
-      console.warn('[ARVYAM] API response missing uncertainty_score field');
-    }
-    
     if (uncertaintyScore > 0.5) {
       console.log('[ARVYAM] Uncertain prompt detected (score:', uncertaintyScore, '), showing Intent Assist');
       setTimeout(() => {
@@ -558,15 +582,16 @@ async function handleSearchSubmit(event) {
 /**
  * Normalize curate response to handle multiple API formats
  * Backend may return: raw array, {arrangements: []}, or {results: []}
- * Always returns {arrangements: []} or null
+ * Always returns {arrangements: [], uncertainty_score: number} or null
  * 
  * Constitutional: Enforces 2 MIX + 1 MONO triad invariance
  * 
  * @param {*} data - Response from /api/curate
- * @returns {Object|null} Normalized {arrangements: []} or null
+ * @returns {Object|null} Normalized {arrangements: [], uncertainty_score: number} or null
  */
 function normalizeCurateResponse(data) {
   let arrangements = null;
+  let uncertaintyScore = 0.0; // Default to 0 if missing (A0 compatibility shim)
 
   if (Array.isArray(data)) {
     // API returns a raw triad array
@@ -574,9 +599,19 @@ function normalizeCurateResponse(data) {
   } else if (data && Array.isArray(data.arrangements)) {
     // API already wrapped in {arrangements: [...]}
     arrangements = data.arrangements;
+    
+    // Extract uncertainty_score if present
+    if (typeof data.uncertainty_score === 'number') {
+      uncertaintyScore = data.uncertainty_score;
+    }
   } else if (data && Array.isArray(data.results)) {
     // Tolerate {results: [...]} for backwards compatibility
     arrangements = data.results;
+    
+    // Extract uncertainty_score if present
+    if (typeof data.uncertainty_score === 'number') {
+      uncertaintyScore = data.uncertainty_score;
+    }
   }
 
   // Constitutional: Enforce exactly 3 arrangements (2 MIX + 1 MONO)
@@ -586,7 +621,10 @@ function normalizeCurateResponse(data) {
     return null;
   }
 
-  return { arrangements };
+  return { 
+    arrangements, 
+    uncertainty_score: uncertaintyScore 
+  };
 }
 
 /**
