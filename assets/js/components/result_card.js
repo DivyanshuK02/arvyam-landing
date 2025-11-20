@@ -105,6 +105,8 @@ export default class ResultCard {
       <div class="result-card__image-wrapper">
         <img
           src="${this.escapeHtml(this.data.image)}"
+          decoding="async"
+          fetchpriority="${this.options.fetchPriority || 'auto'}"
           alt="${this.escapeHtml(altText)}"
           width="400"
           height="500"
