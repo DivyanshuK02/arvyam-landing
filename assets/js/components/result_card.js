@@ -88,16 +88,16 @@ export default class ResultCard {
     ]);
     
     // Get price if available (A1: price display - robust fallback)
-    let priceHtml = '';
+    // PRE-STEP-10 FIX: Always create price text (not HTML), element always rendered
+    let priceText = '';
     const price = this.data.price_inr ?? this.data.price; // Fallback to 'price' field
     if (price != null && price > 0) {
       // Use Intl.NumberFormat for proper currency formatting
-      const formatted = new Intl.NumberFormat('en-IN', {
+      priceText = new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR',
         maximumFractionDigits: 0
       }).format(price);
-      priceHtml = `<p class="result-card__price">${this.escapeHtml(formatted)}</p>`;
     }
 
     // SPEC COMPLIANT: Simple <img> with WebP only, width/height attributes
@@ -122,7 +122,7 @@ export default class ResultCard {
           ${this.escapeHtml(subtitle)}
         </p>
         
-        ${priceHtml}
+        <p class="result-card__price">${this.escapeHtml(priceText)}</p>
 
         <p class="result-card__description">
           ${this.escapeHtml(description)}
