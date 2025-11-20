@@ -229,8 +229,25 @@
       .card .pad{ padding:14px 14px 16px; row-gap:6px; }
     }
   </style>
+  
+  <!-- Analytics: Initialize dataLayer (Step 12 - Auditor Pattern) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'arvyam.page_view',
+      persona: 'ARVY',
+      page_path: location.pathname,
+      referrer: document.referrer && document.referrer.split('?')[0]
+    });
+  </script>
 </head>
 <body>
+
+  <!-- Analytics: Noscript fallback pixel (Step 12 - Auditor Pattern) -->
+  <noscript>
+    <img src="/api/analytics/pixel?page_path=%2F&persona=ARVY" alt="" style="display:none;" />
+  </noscript>
+  <noscript><img src="/api/analytics/pixel" alt="" width="1" height="1" style="position:absolute;visibility:hidden;"></noscript>
 
   <!-- Skip to main content link (WCAG 2.1 AA) -->
   <a href="#main-content" class="visually-hidden-focusable" id="skip-link">
