@@ -6,6 +6,14 @@
     "copyright": "© {year} {company}। सर्वाधिकार सुरक्षित।",
     "legal_nav": "कानूनी और गोपनीयता जानकारी"
   },
+  "a11y": {
+    "skip_to_main": "मुख्य सामग्री पर जाएं",
+    "results_announce": "3 व्यवस्थाएं दिखा रहा है।",
+    "loading_results": "व्यवस्थाएं लोड हो रही हैं...",
+    "error_inline_prefix": "त्रुटि:",
+    "open_cookie_settings": "कुकी सेटिंग्स खोलें",
+    "consent_dialog_title": "आपकी गोपनीयता महत्वपूर्ण है"
+  },
   "result": {
     "title": "{name}",
     "subtitle": "{occasion}",
