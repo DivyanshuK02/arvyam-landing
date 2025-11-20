@@ -57,15 +57,15 @@
   align-items: center;
   justify-content: center;
   min-height: 44px; /* WCAG touch target minimum */
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;  /* Step 11 Polish: Match Buy button padding (more breathing room) */
+  border-radius: 0.5rem;  /* Step 11 Polish: Match Buy button radius (more modern) */
   font-family: "Lora", Georgia, serif;
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
   border: 0;
-  transition: all 200ms ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;  /* Step 11 Polish: Optimized like Buy button */
   white-space: nowrap;
 }
 
@@ -92,34 +92,34 @@
 }
 
 .btn--secondary {
-  background: var(--card-bg, #ffffff);
-  color: var(--card-text-primary, #111827);
-  border: 1px solid var(--card-border, #e5e7eb);
+  background: #f9fafb;  /* Step 11 Polish: Grey on all devices (better aesthetics) */
+  color: #111827;
+  border: 1px solid #d1d5db;
 }
 
 .btn--secondary:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: #f3f4f6;
+  border-color: #9ca3af;
 }
 
 .btn--secondary:active {
-  background: #f3f4f6;
+  background: #e5e7eb;
   transform: translateY(1px);
 }
 
 .btn--ghost {
-  background: transparent;
-  border: 1px solid var(--card-border, #e5e7eb);
-  color: var(--card-text-primary, #111827);
+  background: #f3f4f6;  /* Step 11 Polish: Light grey on all devices (better aesthetics) */
+  border: 1px solid #d1d5db;
+  color: #111827;
 }
 
 .btn--ghost:hover {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: #d1d5db;
+  background: #e5e7eb;
+  border-color: #9ca3af;
 }
 
 .btn--ghost:active {
-  background: rgba(0, 0, 0, 0.04);
+  background: #d1d5db;
   transform: translateY(1px);
 }
 
@@ -157,21 +157,6 @@
   }
 }
 
-/* Step 11: Mobile button visibility fix - ensure all secondary/ghost buttons visible */
-@media (max-width: 640px) {
-  .btn--secondary {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #111827;
-  }
-  
-  .btn--ghost {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    color: #111827;
-  }
-}
-
 /* ========================================
    Result Card Base Styles
    ======================================== */
@@ -196,6 +181,12 @@
     transform: scale(1.02);
     box-shadow: 0 4px 12px var(--card-shadow-hover);
   }
+}
+
+/* Step 11 Polish: Touch feedback for mobile - provides tactile response on tap */
+.result-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 2px var(--card-shadow);
 }
 
 /* Focus state for keyboard navigation */
@@ -239,6 +230,11 @@
   .result-card:hover .result-card__image {
     transform: scale(1.05);
   }
+}
+
+/* Step 11 Polish: Image touch feedback for mobile */
+.result-card:active .result-card__image {
+  transform: scale(1.02);
 }
 
 /* ========================================
@@ -865,19 +861,6 @@
 
   .consent-toast__actions .btn {
     width: 100%;
-  }
-  
-  /* Step 11: Fix mobile button fade - ensure secondary/ghost buttons visible */
-  .consent-toast__actions .btn--secondary {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #111827;
-  }
-  
-  .consent-toast__actions .btn--ghost {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    color: #111827;
   }
 }
 
