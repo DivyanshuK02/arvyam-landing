@@ -214,11 +214,40 @@ export default class PolicyFooter {
       return;
     }
     
-    // Re-render with new language
-    await this.render(this.container);
+    // PRE-STEP-10 FIX: Surgical text updates instead of full re-render
+    // Previous implementation: render(this.container) nuked entire footer including LanguageSwitch pill
+    // New approach: Update only PolicyFooter's own text content via selectors
     
-    // Re-attach event listeners
-    this.setupEventListeners();
+    // Get translated strings
+    const [privacyText, termsText, cookiesText, copyrightText, legalNavLabel] = await Promise.all([
+      t('policy.privacy', lang),
+      t('policy.terms', lang),
+      t('policy.cookies', lang),
+      t('policy.copyright', lang, { year: this.copyrightYear, company: this.companyName }),
+      t('policy.legal_nav', lang)
+    ]);
+    
+    // Update nav aria-label
+    const nav = this.container.querySelector('.policy-footer__nav');
+    if (nav) nav.setAttribute('aria-label', legalNavLabel);
+    
+    // Update link text content (not innerHTML, just text)
+    const privacyLink = this.container.querySelector('[data-test="privacy-link"]');
+    const termsLink = this.container.querySelector('[data-test="terms-link"]');
+    const cookiesBtn = this.container.querySelector('[data-test="cookies-link"]');
+    
+    if (privacyLink) privacyLink.textContent = privacyText;
+    if (termsLink) termsLink.textContent = termsText;
+    if (cookiesBtn) cookiesBtn.textContent = cookiesText;
+    
+    // Update copyright text
+    const copyright = this.container.querySelector('.policy-footer__copyright');
+    if (copyright) copyright.textContent = copyrightText;
+    
+    // Re-cache manage button reference (selector-based, so still valid after text updates)
+    this.manageButton = this.container.querySelector('.policy-footer__manage');
+    
+    console.log(`[PolicyFooter] Language updated (surgical) without DOM destruction`);
   }
 
   /**
