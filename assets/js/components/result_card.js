@@ -107,7 +107,7 @@ export default class ResultCard {
           src="${this.escapeHtml(this.data.image)}"
           alt="${this.escapeHtml(altText)}"
           width="400"
-          height="400"
+          height="500"
           ${this.options.lazyLoad ? 'loading="lazy"' : ''}
           class="result-card__image"
         >
