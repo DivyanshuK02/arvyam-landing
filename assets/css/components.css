@@ -297,7 +297,7 @@
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: var(--card-transition);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
   text-align: center;
   width: 100%;
 }
@@ -1659,3 +1659,13 @@
 /* ========================================================================
    End PolicyFooter Styles
    ======================================================================== */
+
+/* ========================================================================
+   Step 11 Performance Optimizations
+   ======================================================================== */
+
+/* Below-the-fold containment - renders off-screen content only when needed */
+.cv-auto { 
+  content-visibility: auto; 
+  contain-intrinsic-size: 1px 1000px; 
+}
