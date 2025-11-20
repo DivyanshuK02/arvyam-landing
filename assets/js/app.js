@@ -406,23 +406,10 @@ async function updateStaticUIText(lang) {
       if (ctaText) searchButton.textContent = ctaText;
     }
     
-    // A3: Update hero buttons via data-i18n attributes
-    const heroButtonMap = [
-      { selector: 'a[href="#curate"]', key: 'hero.title' }, // "Begin my journey" - closest key
-      { selector: 'a[href="#how"]', key: 'common.continue' } // "How it works" - using fallback
-    ];
-    
-    for (const { selector, key } of heroButtonMap) {
-      const el = document.querySelector(selector);
-      if (el) {
-        try {
-          const text = await t(key, lang);
-          if (text) el.textContent = text;
-        } catch (e) {
-          // Skip if key doesn't exist
-        }
-      }
-    }
+    // PRE-STEP-10 FIX: Hero buttons are static HTML and should NOT be updated by i18n
+    // They maintain their original English text as per design intent
+    // Previous A3 implementation incorrectly overwrote them with stringbank keys
+    // (Removed lines 410-425: heroButtonMap and iteration loop)
     
     // A3: Update refine bar placeholder if present
     const refineInput = document.querySelector('#refine-input, .refine-bar__input');
