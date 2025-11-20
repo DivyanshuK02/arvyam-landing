@@ -590,7 +590,7 @@ export default class ConsentBanner {
       savePreferences.className = 'consent-btn consent-btn-primary consent-btn-full';
       
       // Fetch translation for save button
-      const saveText = await t('consent.savePreferences', this.currentLanguage);
+      const saveText = await t('consent.save_preferences', this.currentLanguage);
       savePreferences.textContent = saveText;
       savePreferences.setAttribute('aria-label', saveText);
       savePreferences.addEventListener('click', () => this.handleSavePreferences());
