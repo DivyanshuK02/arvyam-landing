@@ -14,6 +14,7 @@
 
 import { detectLanguage, setLanguage } from './i18n/lang_detect.js';
 import { t, preloadStringbanks } from './i18n/strings.js';
+import { initAccessibility, announce } from './a11y.js';
 import ConsentBanner from './components/consent_banner.js';
 import IntentAssist from './intent_assist.js';
 import ResultCard from './components/result_card.js';
@@ -65,6 +66,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('[ARVYAM] Initializing Phase 2 frontend...');
   
   try {
+    // Step 0: Initialize accessibility features (WCAG 2.1 AA)
+    initAccessibility();
+    
     // Step 1: Detect and set language
     await initializeLanguage();
     
@@ -483,7 +487,7 @@ async function handleIntentClarified(event) {
     });
     
     // Perform new search with enriched prompt
-    showLoadingState();
+    await showLoadingState();
     
     try {
       const results = await searchArrangements(intentData.enrichedPrompt);
@@ -590,7 +594,7 @@ async function handleSearchSubmit(event) {
   }
   
   // Show loading state
-  showLoadingState();
+  await showLoadingState();
   
   try {
     // Call backend API
@@ -776,7 +780,7 @@ async function searchWithHints(prompt, hints) {
   }
   
   // Show loading state
-  showLoadingState();
+  await showLoadingState();
   
   // Clear previous errors
   hideFieldError();
@@ -879,7 +883,7 @@ async function handleRefineSubmit(refinementText) {
   console.log('[ARVYAM] Refining results (refinement text NOT logged)');
   
   // Show loading state
-  showLoadingState();
+  await showLoadingState();
   
   // Detach RefineBar while loading
   if (refineBar) {
@@ -1041,6 +1045,10 @@ async function displayResults(data) {
   
   resultsContainer.appendChild(grid);
   
+  // Announce results to screen readers (WCAG 2.1 AA)
+  const resultsAnnouncement = await t('a11y.results_announce', currentLanguage) || 'Showing 3 arrangements.';
+  announce(resultsAnnouncement);
+  
   // Track results displayed (always 3 at this point)
   trackEvent('results_displayed', {
     result_count: 3, // Constitutional guarantee
@@ -1099,7 +1107,7 @@ async function createResultCard(arrangement, index) {
 /**
  * Show loading skeleton state
  */
-function showLoadingState() {
+async function showLoadingState() {
   if (!resultsContainer) return;
   
   resultsContainer.innerHTML = '';
@@ -1138,6 +1146,10 @@ function showLoadingState() {
   }
   
   resultsContainer.appendChild(grid);
+  
+  // Announce loading state to screen readers (WCAG 2.1 AA)
+  const loadingAnnouncement = await t('a11y.loading_results', currentLanguage) || 'Loading arrangements...';
+  announce(loadingAnnouncement);
 }
 
 // ============================================================================
