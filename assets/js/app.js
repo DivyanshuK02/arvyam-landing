@@ -1077,7 +1077,9 @@ async function createResultCard(arrangement, index) {
       occasion: arrangement.occasion || arrangement.tier || '',
       description: arrangement.desc || arrangement.description || '',
       image: arrangement.image || arrangement.image_url || '/assets/placeholder.jpg',
-      imageAlt: arrangement.alt_text || null
+      imageAlt: arrangement.alt_text || null,
+      price_inr: arrangement.price_inr,  // From normalization
+      price: arrangement.price            // Fallback from API
     }, {
       lang: currentLanguage,
       lazyLoad: index > 0, // Only lazy load cards after first one
