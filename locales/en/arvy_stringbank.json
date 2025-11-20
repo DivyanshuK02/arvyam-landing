@@ -6,6 +6,14 @@
     "copyright": "© {year} {company}. All rights reserved.",
     "legal_nav": "Legal and privacy information"
   },
+  "a11y": {
+    "skip_to_main": "Skip to main content",
+    "results_announce": "Showing 3 arrangements.",
+    "loading_results": "Loading arrangements...",
+    "error_inline_prefix": "Error:",
+    "open_cookie_settings": "Open cookie settings",
+    "consent_dialog_title": "Your privacy matters"
+  },
   "result": {
     "title": "{name}",
     "subtitle": "{occasion}",
