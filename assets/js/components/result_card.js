@@ -141,6 +141,15 @@ export default class ResultCard {
     // Set aria-labelledby to title
     card.setAttribute('aria-labelledby', this.titleId);
 
+    // AUDITOR PATCH E: Explicit price rendering (safety measure)
+    const priceNode = card.querySelector('.result-card__price');
+    if (priceNode) {
+      const inr = this.data.price_inr ?? this.data.price ?? null;
+      priceNode.textContent = (inr != null)
+        ? `₹${Number(inr).toLocaleString('en-IN')}`
+        : '';
+    }
+
     this.element = card;
     this.bindEvents();
 
