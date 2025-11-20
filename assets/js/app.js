@@ -81,11 +81,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Step 4: Initialize Intent Assist
     initializeIntentAssist();
     
-    // Step 5: Initialize HintForm
-    initializeHintForm();
+    // Step 5-6: Defer heavy/optional init work (Step 11 Performance)
+    const schedule = (fn) => ('requestIdleCallback' in window) 
+      ? requestIdleCallback(fn) 
+      : setTimeout(fn, 120);
     
-    // Step 6: Initialize RefineBar
-    initializeRefineBar();
+    schedule(() => {
+      // Step 5: Initialize HintForm (below-fold, optional)
+      initializeHintForm();
+      
+      // Step 6: Initialize RefineBar (below-fold, shown after results)
+      initializeRefineBar();
+    });
     
     // Step 7: Initialize PolicyFooter (Step 9) - MUST be before LanguageSwitch
     await initializePolicyFooter();
@@ -1091,6 +1098,7 @@ async function createResultCard(arrangement, index) {
     }, {
       lang: currentLanguage,
       lazyLoad: index > 0, // Only lazy load cards after first one
+      fetchPriority: index < 3 ? 'high' : 'low', // Step 11: Prioritize first 3 cards
       onSelect: (data) => {
         console.log('[ARVYAM] Card selected via callback:', data);
         // Event is also emitted by the card itself
