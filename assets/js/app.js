@@ -393,6 +393,12 @@ async function handleLanguageChange(event) {
  */
 async function updateStaticUIText(lang) {
   try {
+    // Hero heading & subtitle (AUDITOR PATCH C)
+    const heroTitleEl = document.getElementById('hero-title');
+    const heroSubtitleEl = document.getElementById('hero-subtitle');
+    if (heroTitleEl) heroTitleEl.textContent = await t('hero.title', lang);
+    if (heroSubtitleEl) heroSubtitleEl.textContent = await t('hero.subtitle', lang);
+    
     // Update search input placeholder
     if (searchInput) {
       const placeholder = await t('search.placeholder', lang);
