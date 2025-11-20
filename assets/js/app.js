@@ -39,13 +39,18 @@ const API_BASE = window.ARVYAM_API_BASE || 'https://arvyam-api.onrender.com';
 // ============================================================================
 
 let currentLanguage = 'en';
+let prevLanguage = 'en'; // Track previous language for language_changed events
 let consentBanner = null;
 let intentAssist = null;
 let hintForm = null;
 let refineBar = null;
 let languageSwitch = null;
 let policyFooter = null;
+
+// Step 12: Analytics state (consent-gated dynamic loading)
+let analytics = null;
 let analyticsEnabled = false;
+
 let uxTurns = 0; // Track user interaction depth
 
 // State for refinement (needed to re-search with adjustments)
@@ -139,9 +144,9 @@ async function initializeConsentBanner() {
     onConsentChange: (consent) => {
       console.log('[ARVYAM] Consent changed:', consent);
       
-      // Initialize analytics if user consented
-      if (consent.analytics) {
-        initializeAnalytics();
+      // Enable analytics if user consented
+      if (consent.analytics && !analyticsEnabled) {
+        enableAnalytics(currentLanguage);
       }
     }
   });
@@ -150,10 +155,10 @@ async function initializeConsentBanner() {
   if (!consentBanner.hasConsent()) {
     await consentBanner.show();
   } else {
-    // Check if analytics should be enabled
+    // Check if analytics should be enabled based on saved consent
     const consent = consentBanner.getConsent();
-    if (consent?.analytics) {
-      initializeAnalytics();
+    if (consent?.analytics && !analyticsEnabled) {
+      enableAnalytics(currentLanguage);
     }
   }
 }
@@ -282,7 +287,22 @@ function setupGlobalListeners() {
   // A3: Listen for arvy:language event (from footer-right pill)
   document.addEventListener('arvy:language', async (e) => {
     const lang = e.detail?.lang || 'en';
+    const previousLang = currentLanguage; // Capture before update
+    
     console.log(`[ARVYAM] arvy:language event received: ${lang}`);
+    
+    // Track language change
+    if (previousLang !== lang) {
+      trackEvent('language_changed', {
+        from_lang: previousLang,
+        to_lang: lang
+      });
+    }
+    
+    // Update analytics language if initialized
+    if (analytics && typeof analytics.setLanguage === 'function') {
+      analytics.setLanguage(lang);
+    }
     
     // Update current language
     currentLanguage = lang;
@@ -468,8 +488,14 @@ function handleConsentChange(event) {
   const consent = event.detail.consent;
   console.log('[ARVYAM] Consent updated:', consent);
   
+  // Enable analytics if user consented and not yet enabled
   if (consent.analytics && !analyticsEnabled) {
-    initializeAnalytics();
+    enableAnalytics(currentLanguage);
+  }
+  
+  // Update analytics consent state if already initialized
+  if (analyticsEnabled && analytics && typeof analytics.setConsent === 'function') {
+    analytics.setConsent(consent);
   }
 }
 
@@ -951,10 +977,10 @@ async function handleRefineSubmit(refinementText) {
     displayResults(data);
     
     // Track successful refinement (NO raw text, only metadata)
-    trackEvent('refine_completed', {
+    trackEvent('refine_submitted', {
       refinement_length_chars: refinementText.length,
-      had_hints: !!lastHints,
-      ux_turns: uxTurns
+      turn_number: uxTurns,
+      had_hints: !!lastHints
     });
     
   } catch (error) {
@@ -1059,6 +1085,7 @@ async function displayResults(data) {
   // Track results displayed (always 3 at this point)
   trackEvent('results_displayed', {
     result_count: 3, // Constitutional guarantee
+    triad: '2_mix_1_mono', // Constitutional structure
     ux_turns: uxTurns
   });
   
@@ -1101,7 +1128,16 @@ async function createResultCard(arrangement, index) {
       fetchPriority: index < 3 ? 'high' : 'low', // Step 11: Prioritize first 3 cards
       onSelect: (data) => {
         console.log('[ARVYAM] Card selected via callback:', data);
-        // Event is also emitted by the card itself
+        
+        // Track product click (Step 12: Analytics)
+        trackEvent('product_clicked', {
+          sku_id: data.id || arrangement.id || `arr-${index}`,
+          card_position: index + 1, // 1-indexed position
+          tier: arrangement.tier || 'unknown',
+          price_inr: arrangement.price_inr || arrangement.price || 0
+        });
+        
+        // Event is also emitted by the card itself for other listeners
       }
     });
     
@@ -1275,43 +1311,123 @@ function showGlobalError(message) {
 }
 
 // ============================================================================
-// Analytics
+// Analytics (Step 12 - Auditor-Approved Pattern)
 // ============================================================================
 
 /**
- * Initialize analytics (lazy loaded)
+ * Initialize dataLayer (idempotent)
  */
-async function initializeAnalytics() {
-  if (analyticsEnabled) return;
-  
+function seedDataLayer() {
+  window.dataLayer = window.dataLayer || [];
+}
+
+// Seed dataLayer immediately
+seedDataLayer();
+
+/**
+ * Get saved consent from localStorage
+ * @returns {Object} Consent object or empty object
+ */
+function getSavedConsent() {
   try {
-    // Placeholder: Would dynamically import analytics.js here
-    // const Analytics = await import('./analytics.js');
-    // window.analytics = new Analytics.default();
-    
-    analyticsEnabled = true;
-    console.log('[ARVYAM] Analytics initialized (placeholder)');
-  } catch (error) {
-    console.warn('[ARVYAM] Analytics failed to load:', error);
+    return JSON.parse(localStorage.getItem('arvyam_cookie_consent')) || {};
+  } catch {
+    return {};
   }
 }
 
 /**
- * Track analytics event (debounced, privacy-first)
+ * Enable analytics by dynamically importing and initializing the module
+ * Only called when user gives consent
+ * @param {string} lang - Current language code
+ */
+async function enableAnalytics(lang = currentLanguage) {
+  if (analyticsEnabled) return;
+  
+  try {
+    // Dynamic import (only loads if user consents)
+    const mod = await import('./analytics.js');
+    const AnalyticsCtor = mod.default || mod.ARVYAMAnalytics;
+    
+    // Create instance with language
+    analytics = new AnalyticsCtor({ language: lang });
+    
+    // Respect consent: we only enable when called due to consent
+    analytics.init({ consent: { analytics: true } });
+    
+    analyticsEnabled = true;
+    
+    console.log('[ARVYAM] Analytics enabled for language:', lang);
+  } catch (err) {
+    console.warn('[ARVYAM] Analytics failed to load:', err);
+  }
+}
+
+/**
+ * Track analytics event (consent-gated, privacy-first)
  * @param {string} eventName - Event name
  * @param {Object} properties - Event properties (NO PII)
  */
 function trackEvent(eventName, properties = {}) {
-  if (!analyticsEnabled) {
-    console.log('[ARVYAM] Analytics disabled, would track:', eventName, properties);
+  // Try the real pipeline first
+  if (analyticsEnabled && analytics && typeof analytics.track === 'function') {
+    analytics.track(eventName, properties);
     return;
   }
   
-  // Placeholder: Would call analytics system here
-  // window.analytics?.track(eventName, properties);
-  
-  console.log('[ARVYAM] Track event:', eventName, properties);
+  // Fail-soft: still push to dataLayer so GTM/GA can observe events
+  seedDataLayer();
+  window.dataLayer.push({ 
+    event: `arvyam.${eventName}`, 
+    ...properties,
+    language: currentLanguage
+  });
 }
+
+// ============================================================================
+// Analytics Event Wiring (Boot + Runtime)
+// ============================================================================
+
+// Boot: Enable analytics if consent already saved
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = getSavedConsent();
+  if (saved.analytics) {
+    enableAnalytics(currentLanguage);
+  }
+});
+
+// Runtime: Listen for consent events (support both event names for compatibility)
+window.addEventListener('arvy:consent', (e) => {
+  if (e?.detail?.analytics) {
+    enableAnalytics(currentLanguage);
+  }
+});
+
+window.addEventListener('consent:changed', (e) => {
+  if (e?.detail?.consent?.analytics) {
+    enableAnalytics(currentLanguage);
+  }
+});
+
+// Language sync: Update analytics when language changes
+window.addEventListener('arvy:language', (e) => {
+  const newLang = (e?.detail?.lang || 'en').toLowerCase();
+  prevLanguage = currentLanguage;
+  currentLanguage = newLang;
+  
+  // Update analytics language if initialized
+  if (analytics && typeof analytics.setLanguage === 'function') {
+    analytics.setLanguage(newLang);
+  }
+  
+  // Track language change event
+  if (prevLanguage !== newLang) {
+    trackEvent('language_changed', { 
+      from_lang: prevLanguage, 
+      to_lang: newLang 
+    });
+  }
+});
 
 // Expose trackEvent globally for components (HintForm, etc.)
 window.trackEvent = trackEvent;
