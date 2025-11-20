@@ -157,6 +157,21 @@
   }
 }
 
+/* Step 11: Mobile button visibility fix - ensure all secondary/ghost buttons visible */
+@media (max-width: 640px) {
+  .btn--secondary {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+  }
+  
+  .btn--ghost {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #111827;
+  }
+}
+
 /* ========================================
    Result Card Base Styles
    ======================================== */
@@ -850,6 +865,19 @@
 
   .consent-toast__actions .btn {
     width: 100%;
+  }
+  
+  /* Step 11: Fix mobile button fade - ensure secondary/ghost buttons visible */
+  .consent-toast__actions .btn--secondary {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+  }
+  
+  .consent-toast__actions .btn--ghost {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #111827;
   }
 }
 
