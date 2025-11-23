@@ -1815,3 +1815,74 @@
     padding: 0.4375rem 0.875rem;
   }
 }
+
+
+/* ============================================================================
+   PHASE 13B.HF - Unified System Feedback (ARVY speaks + hints stack)
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   System Feedback Container (above textarea)
+   ---------------------------------------------------------------------------- */
+
+.system-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ARVY's persistent guidance line */
+.system-feedback__base {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #6F6A62;
+  font-style: italic;
+}
+
+/* ----------------------------------------------------------------------------
+   Refined Hint Styles (softer, line-like appearance)
+   ---------------------------------------------------------------------------- */
+
+/* Language nudge - keep existing structure, ensure it works in stack */
+.system-feedback .lang-nudge {
+  margin: 0; /* Remove any external margin since container provides spacing */
+}
+
+/* Budget hint - softer appearance for inline context */
+.system-feedback .budget-hint {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #F4E1C7;
+  background: rgba(255, 247, 235, 0.8);
+  color: #2B2B2B;
+}
+
+.system-feedback .budget-hint strong {
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------------------------
+   Textarea Spacing Adjustment
+   ---------------------------------------------------------------------------- */
+
+.meaning-input {
+  margin-top: 0; /* system-feedback already provides spacing above */
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .system-feedback__base {
+    font-size: 0.875rem;
+  }
+  
+  .system-feedback .budget-hint {
+    font-size: 0.875rem;
+    padding: 0.4375rem 0.625rem;
+  }
+}
