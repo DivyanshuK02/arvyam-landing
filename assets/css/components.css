@@ -1650,3 +1650,168 @@
   content-visibility: auto; 
   contain-intrinsic-size: 1px 1000px; 
 }
+
+/* ============================================================================
+   PHASE 13B ADDITIONS - Meaning Engine UX Transformation
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   PHASE 13B.6: Meaning Input (Textarea with Breathing Animation)
+   ---------------------------------------------------------------------------- */
+
+.meaning-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.875rem 1rem;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: #2B2B2B;
+  background: #FFFFFF;
+  border: 1.5px solid #E0E0E0;
+  border-radius: 8px;
+  resize: none;
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  
+  /* Breathing animation (museum-grade premium detail) */
+  animation: gentle-breathe 4s ease-in-out infinite;
+}
+
+.meaning-input:focus {
+  outline: none;
+  border-color: #E6B17E;
+  box-shadow: 0 0 0 3px rgba(230, 177, 126, 0.1);
+}
+
+.meaning-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Mobile: Prevent iOS zoom on focus */
+@media (max-width: 768px) {
+  .meaning-input {
+    font-size: 16px;
+  }
+}
+
+/* Breathing animation keyframes */
+@keyframes gentle-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.005);
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .meaning-input {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   PHASE 13B.2: Hindi Auto-Detect Nudge
+   ---------------------------------------------------------------------------- */
+
+.lang-nudge {
+  display: none;
+  background: #FFF9F0;
+  border: 1px solid #E6B17E;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  margin: 0.75rem 0;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #2B2B2B;
+}
+
+.lang-nudge p {
+  margin: 0 0 0.625rem 0;
+}
+
+.lang-nudge p:last-child {
+  margin-bottom: 0;
+}
+
+.lang-nudge-actions {
+  display: flex;
+  gap: 0.625rem;
+  margin-top: 0.875rem;
+}
+
+.lang-nudge-btn {
+  padding: 0.5rem 1rem;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-nudge-btn--primary {
+  background: #E6B17E;
+  color: #FFFFFF;
+}
+
+.lang-nudge-btn--primary:hover {
+  background: #D9A06D;
+}
+
+.lang-nudge-btn--secondary {
+  background: transparent;
+  color: #2B2B2B;
+  border: 1px solid #E0E0E0;
+}
+
+.lang-nudge-btn--secondary:hover {
+  background: #F5F5F5;
+}
+
+/* ----------------------------------------------------------------------------
+   PHASE 13B.7: Budget Hint
+   ---------------------------------------------------------------------------- */
+
+.budget-hint {
+  background: #F9FAFB;
+  border-left: 3px solid #E6B17E;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  font-family: 'Lora', Georgia, serif;
+  border-radius: 4px;
+}
+
+.budget-hint p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #2B2B2B;
+}
+
+.budget-hint strong {
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .budget-hint {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .lang-nudge {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .lang-nudge-btn {
+    font-size: 0.8125rem;
+    padding: 0.4375rem 0.875rem;
+  }
+}
