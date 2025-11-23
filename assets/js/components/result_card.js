@@ -2,6 +2,10 @@
  * ARVYAM Result Card Component
  * Displays a single curated bouquet with image, title, subtitle, description, and CTA
  * Phase 2 UI/UX - Step 5 (SPEC COMPLIANT)
+ * 
+ * PHASE 13A CHANGES:
+ * - 13A.1: Buy button URLs (checkout navigation)
+ * - 13A.2: Price display fix (data.price field, proper formatting)
  */
 
 import { t } from '../i18n/strings.js';
@@ -19,6 +23,7 @@ export default class ResultCard {
    * @param {string} data.occasion - Occasion/relationship hint (3-5 words)
    * @param {string} data.description - Brief description (≤25 words)
    * @param {string} data.image - Path to WebP image (no fallback needed)
+   * @param {number} [data.price] - Price in INR (integer)
    * @param {string} [data.imageAlt] - Optional alt text override
    * @param {Object} [options={}] - Configuration options
    * @param {string} [options.lang='en'] - Language code
@@ -38,6 +43,9 @@ export default class ResultCard {
     this.boundHandlers = new Map();
     this.cardId = `result-card-${data.id}`;
     this.titleId = `${this.cardId}-title`;
+    
+    // PHASE 13A.1: Build checkout URL from SKU ID
+    this.checkoutUrl = `/checkout?sku=${data.id}`;
   }
 
   /**
@@ -87,11 +95,13 @@ export default class ResultCard {
         : t('result.image_alt', this.options.lang, { name: this.data.name })
     ]);
     
-    // Get price if available (A1: price display - robust fallback)
-    // PRE-STEP-10 FIX: Always create price text (not HTML), element always rendered
-    let priceText = '';
-    const price = this.data.price_inr ?? this.data.price; // Fallback to 'price' field
-    if (price != null && price > 0) {
+    // PHASE 13A.2: Price display fix - use correct field from API
+    // Backend returns "price" field (NOT "price_inr")
+    // Spec requires "—" fallback when price is missing/invalid
+    let priceText = '—'; // Fallback as per acceptance criteria
+    const price = this.data.price; // Use correct field name
+    
+    if (typeof price === 'number' && price > 0) {
       // Use Intl.NumberFormat for proper currency formatting
       priceText = new Intl.NumberFormat('en-IN', {
         style: 'currency',
@@ -130,27 +140,18 @@ export default class ResultCard {
           ${this.escapeHtml(description)}
         </p>
 
-        <button
-          type="button"
-          class="result-card__cta"
+        <a
+          href="${this.checkoutUrl}"
+          class="btn btn--primary result-card__cta"
           aria-label="${this.escapeHtml(ctaText)} - ${this.escapeHtml(title)}"
         >
           ${this.escapeHtml(ctaText)}
-        </button>
+        </a>
       </div>
     `;
 
     // Set aria-labelledby to title
     card.setAttribute('aria-labelledby', this.titleId);
-
-    // AUDITOR PATCH E: Explicit price rendering (safety measure)
-    const priceNode = card.querySelector('.result-card__price');
-    if (priceNode) {
-      const inr = this.data.price_inr ?? this.data.price ?? null;
-      priceNode.textContent = (inr != null)
-        ? `₹${Number(inr).toLocaleString('en-IN')}`
-        : '';
-    }
 
     this.element = card;
     this.bindEvents();
@@ -213,7 +214,8 @@ export default class ResultCard {
 
   /**
    * Handles card selection
-   * Emits custom event and calls callback
+   * PHASE 13A.1: CTA is now semantic <a href> - navigation handled by browser
+   * Emits custom event and calls callback for analytics/tracking
    */
   handleSelect() {
     // Emit custom event
@@ -228,10 +230,13 @@ export default class ResultCard {
 
     this.element.dispatchEvent(event);
 
-    // Call optional callback
+    // Call optional callback (for analytics tracking)
     if (typeof this.options.onSelect === 'function') {
       this.options.onSelect(this.data);
     }
+    
+    // Note: Navigation now handled by <a href> semantically
+    // This preserves middle-click/right-click/screen reader functionality
   }
 
   /**
@@ -290,10 +295,12 @@ export default class ResultCard {
         : t('result.image_alt', lang, { name: this.data.name })
     ]);
     
-    // Get price translation if available (A1: price display - robust fallback)
-    let priceText = '';
-    const price = this.data.price_inr ?? this.data.price;
-    if (price != null && price > 0) {
+    // PHASE 13A.2: Price translation with correct field
+    // Spec requires "—" fallback when price is missing/invalid
+    let priceText = '—'; // Fallback as per acceptance criteria
+    const price = this.data.price; // Use correct field name
+    
+    if (typeof price === 'number' && price > 0) {
       priceText = new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR',
@@ -311,7 +318,7 @@ export default class ResultCard {
 
     if (titleEl) titleEl.textContent = title;
     if (subtitleEl) subtitleEl.textContent = subtitle;
-    if (priceEl && priceText) priceEl.textContent = priceText;
+    if (priceEl) priceEl.textContent = priceText;
     if (descEl) descEl.textContent = description;
     if (ctaEl) {
       ctaEl.textContent = ctaText;
