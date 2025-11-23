@@ -284,11 +284,21 @@
       <div class="curate-card">
         <label for="feelings-input" class="sr-only">Your message</label>
 
+        <!-- PHASE 13B.2: Hindi auto-detect nudge -->
+        <div id="lang-nudge" class="lang-nudge" style="display:none;">
+          <p>It looks like you might prefer Hindi. Would you like to switch?</p>
+          <div class="lang-nudge-actions">
+            <button id="lang-nudge-switch" class="lang-nudge-btn lang-nudge-btn--primary">Switch to Hindi</button>
+            <button id="lang-nudge-close" class="lang-nudge-btn lang-nudge-btn--secondary">No thanks</button>
+          </div>
+        </div>
+
         <form id="curate-form" class="form-grid">
-          <input id="feelings-input" class="input" name="message"
-                 placeholder="Write a feeling or occasion…"
+          <!-- PHASE 13B.6: Textarea with auto-resize (core "meaning engine" UX) -->
+          <textarea id="feelings-input" class="meaning-input" name="message"
+                 placeholder="Share what's in your heart..."
                  aria-describedby="field-error hint"
-                 maxlength="240" required>
+                 maxlength="240" rows="1" data-auto-resize="true" required></textarea>
           <button type="submit" class="btn btn--secondary" aria-label="Curate suggestions">Curate</button>
         </form>
 
@@ -296,6 +306,9 @@
 
         <div id="hint" class="hint">Examples: "A quiet thank you for my mentor." · "Celebrating five years together." · "She's had a tough week."</div>
       </div>
+
+      <!-- PHASE 13B.7: Budget hint container -->
+      <div id="budget-hint-container"></div>
 
       <div id="curated-results" class="grid"></div>
     </section>
