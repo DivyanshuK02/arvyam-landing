@@ -57,6 +57,9 @@ let uxTurns = 0; // Track user interaction depth
 let lastPrompt = '';
 let lastHints = null;
 
+// PHASE 13A.4: Card data persistence (prevents data loss on language switch)
+let currentCardData = null;
+
 // DOM element references
 let searchForm = null;
 let searchInput = null;
@@ -331,11 +334,86 @@ function setupGlobalListeners() {
       await consentBanner.updateLanguage(lang);
     }
     
-    // Re-render result cards if present
-    const existingCards = resultsContainer?.querySelectorAll('.result-card');
-    if (existingCards && existingCards.length > 0) {
-      // Cards already have updateLanguage method (from A1)
-      console.log(`[ARVYAM] Re-rendering ${existingCards.length} result cards`);
+    // PHASE 13A.4: Re-render result cards with persisted data (prevents card loss)
+    // Only update UI LABELS, not product content (product names/descriptions stay in catalog language)
+    if (currentCardData && currentCardData.length > 0) {
+      console.log(`[ARVYAM] Re-rendering ${currentCardData.length} result cards with language: ${lang}`);
+      
+      // Clear and re-render cards with new language
+      const resultsContainer = document.getElementById('curated-results');
+      if (resultsContainer) {
+        // CONSTITUTIONAL: Enforce triad invariance during language re-render
+        const arrangements = currentCardData.slice(0, 3);
+        
+        // Validate we have at least 3 arrangements before re-rendering
+        if (arrangements.length < 3) {
+          console.error('[ARVYAM] Triad violation during language switch: insufficient card data');
+          currentCardData = null;
+          showError('We could not complete your curation just now. Please try again.');
+          trackEvent('triad_violation_language_switch', {
+            card_count: arrangements.length,
+            from_lang: previousLang,
+            to_lang: lang
+          });
+          return;
+        }
+        
+        // Clear existing cards
+        resultsContainer.innerHTML = '';
+        
+        // Create grid container
+        const grid = document.createElement('div');
+        grid.className = 'results-grid';
+        grid.setAttribute('role', 'list');
+        grid.style.cssText = `
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin-top: 2rem;
+        `;
+        
+        // Re-create cards with new language
+        const cardPromises = arrangements.map((arrangement, index) => {
+          return createResultCard(arrangement, index);
+        });
+        
+        const cards = await Promise.all(cardPromises);
+        const validCards = cards.filter(card => card !== null);
+        
+        // CONSTITUTIONAL: Enforce exactly 3 cards after render
+        if (validCards.length !== 3) {
+          console.error(
+            `[ARVYAM] Constitutional triad violation during language re-render: expected 3 cards, got ${validCards.length}`
+          );
+          currentCardData = null;
+          showError('We could not complete your curation just now. Please try again.');
+          trackEvent('triad_violation_language_switch', {
+            rendered: validCards.length,
+            requested: arrangements.length,
+            from_lang: previousLang,
+            to_lang: lang
+          });
+          return;
+        }
+        
+        // Safe to display - we have exactly 3 valid cards
+        validCards.forEach(card => {
+          const listItem = document.createElement('div');
+          listItem.setAttribute('role', 'listitem');
+          listItem.appendChild(card);
+          grid.appendChild(listItem);
+        });
+        
+        resultsContainer.appendChild(grid);
+        
+        // Re-attach RefineBar if it was showing
+        if (refineBar && lastPrompt) {
+          refineBar.attach(resultsContainer, {
+            hasHints: !!lastHints,
+            uncertaintyScore: 0
+          });
+        }
+      }
     }
   });
   
@@ -1018,6 +1096,10 @@ async function displayResults(data) {
     console.error(
       `[ARVYAM] Backend triad violation: expected 3 arrangements, got ${arrangements.length}`
     );
+    
+    // PHASE 13A.4: Reset card data on validation failure
+    currentCardData = null;
+    
     showError('We could not complete your curation just now. Please try again.');
     
     trackEvent('backend_triad_violation', {
@@ -1057,6 +1139,9 @@ async function displayResults(data) {
       { requested: arrangements.length, rendered: validCards.length }
     );
     
+    // PHASE 13A.4: Reset card data on validation failure
+    currentCardData = null;
+    
     showError('We could not complete your curation just now. Please try again.');
     
     trackEvent('triad_violation', {
@@ -1067,6 +1152,10 @@ async function displayResults(data) {
     
     return;
   }
+  
+  // PHASE 13A.4: Persist card data AFTER triad validation passes (constitutional compliance)
+  // Only store data when we have confirmed exactly 3 valid cards
+  currentCardData = arrangements;
   
   // If we reach here, we ALWAYS have exactly 3 cards (constitutional guarantee)
   validCards.forEach(card => {
@@ -1406,26 +1495,6 @@ window.addEventListener('arvy:consent', (e) => {
 window.addEventListener('consent:changed', (e) => {
   if (e?.detail?.consent?.analytics) {
     enableAnalytics(currentLanguage);
-  }
-});
-
-// Language sync: Update analytics when language changes
-window.addEventListener('arvy:language', (e) => {
-  const newLang = (e?.detail?.lang || 'en').toLowerCase();
-  prevLanguage = currentLanguage;
-  currentLanguage = newLang;
-  
-  // Update analytics language if initialized
-  if (analytics && typeof analytics.setLanguage === 'function') {
-    analytics.setLanguage(newLang);
-  }
-  
-  // Track language change event
-  if (prevLanguage !== newLang) {
-    trackEvent('language_changed', { 
-      from_lang: prevLanguage, 
-      to_lang: newLang 
-    });
   }
 });
 
