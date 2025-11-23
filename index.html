@@ -70,25 +70,6 @@
     }
     .bar{display:flex; align-items:center; justify-content:flex-start; gap:12px; padding:16px}
 
-    /* Buttons */
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      height:var(--ctl-h); padding:0 24px; border-radius:var(--radius-ctl);
-      border:1px solid rgba(0,0,0,.05); background:#fff; cursor:pointer;
-      box-shadow:0 2px 0 rgba(0,0,0,.06) inset, 0 1px 2px rgba(0,0,0,.04);
-      transition:opacity .15s ease, transform .15s ease;
-      font-family:"Lora",Georgia,serif;
-      font-weight:600; font-size:17px;
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn--primary{background:var(--accent); color:var(--accent-ink)}
-    .btn:focus-visible, .input:focus-visible{
-       outline:2px solid rgba(43,43,43,.75);
-       outline-offset:3px;
-       box-shadow:0 0 0 4px rgba(230,177,126,.28);
-    }
-    .input:focus-visible{ border-color: rgba(230,177,126,.55); }
-
     /* Photo frame */
     .frame{background:#fff; border-radius:var(--radius-photo); overflow:hidden; box-shadow:var(--shadow)}
     .frame img{width:100%; height:100%; object-fit:cover; object-position:center}
@@ -270,8 +251,8 @@
             A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
           </p>
           <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:28px">
-            <a class="btn btn--primary btn--lg" href="#curate" aria-label="Start your curated gift">Begin my journey</a>
-            <a class="btn btn--secondary btn--lg" href="#how" aria-label="Learn how Arvyam works">How it works</a>
+            <a class="btn btn--secondary" href="#curate" aria-label="Start your curated gift">Begin my journey</a>
+            <a class="btn btn--tertiary" href="#how" aria-label="Learn how Arvyam works">How it works</a>
           </div>
         </div>
         <figure class="frame" id="hero-frame">
@@ -308,7 +289,7 @@
                  placeholder="Write a feeling or occasion…"
                  aria-describedby="field-error hint"
                  maxlength="240" required>
-          <button type="submit" class="btn btn--primary" aria-label="Curate suggestions">Curate</button>
+          <button type="submit" class="btn btn--secondary" aria-label="Curate suggestions">Curate</button>
         </form>
 
         <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
