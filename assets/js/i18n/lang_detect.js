@@ -114,6 +114,67 @@ export function detectLanguage() {
 }
 
 /**
+ * PHASE 13B.2: Detect language from text content (Hindi auto-detection)
+ * Analyzes text for Devanagari characters to suggest Hindi
+ * @param {string} text - Text to analyze
+ * @returns {Object} Detection result { devanagariPercent, suggestedLang, isAmbiguous }
+ */
+export function detectLanguageFromText(text) {
+  if (!text || text.length === 0) {
+    return {
+      devanagariPercent: 0,
+      suggestedLang: 'en',
+      isAmbiguous: false
+    };
+  }
+
+  // Count Devanagari characters (U+0900 to U+097F)
+  const devanagariPattern = /[\u0900-\u097F]/g;
+  const devanagariMatches = text.match(devanagariPattern);
+  const devanagariCount = devanagariMatches ? devanagariMatches.length : 0;
+
+  // Total meaningful characters (excluding spaces, punctuation)
+  const meaningfulPattern = /[^\s\p{P}]/gu;
+  const meaningfulMatches = text.match(meaningfulPattern);
+  const totalCount = meaningfulMatches ? meaningfulMatches.length : 0;
+
+  if (totalCount === 0) {
+    return {
+      devanagariPercent: 0,
+      suggestedLang: 'en',
+      isAmbiguous: false
+    };
+  }
+
+  const devanagariPercent = (devanagariCount / totalCount) * 100;
+
+  // Hysteresis thresholds to prevent flip-flopping
+  // ≥65% Devanagari → Suggest Hindi
+  // ≤35% Devanagari → Prefer English
+  // 35-65% → Ambiguous, maintain current language
+  let suggestedLang;
+  let isAmbiguous;
+
+  if (devanagariPercent >= 65) {
+    suggestedLang = 'hi';
+    isAmbiguous = false;
+  } else if (devanagariPercent <= 35) {
+    suggestedLang = 'en';
+    isAmbiguous = false;
+  } else {
+    // Ambiguous range - no strong recommendation
+    suggestedLang = null;
+    isAmbiguous = true;
+  }
+
+  return {
+    devanagariPercent,
+    suggestedLang,
+    isAmbiguous
+  };
+}
+
+/**
  * Sets the application language
  * Validates the language, saves to localStorage, and updates HTML lang attribute
  * @param {string} lang - Language code to set
