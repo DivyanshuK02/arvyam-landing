@@ -77,6 +77,12 @@ let searchInput = null;
 let resultsContainer = null;
 let loadingIndicator = null;
 
+// PHASE 13B.HF: System feedback elements
+let curateButton = null;
+let systemFeedbackEl = null;
+let langNudgeEl = null;
+let budgetHintEl = null;
+
 // ============================================================================
 // Application Initialization
 // ============================================================================
@@ -135,6 +141,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // PHASE 13B.2: Initialize Hindi auto-detection
     initializeHindiAutoDetect();
+    
+    // PHASE 13B.HF: Initialize system feedback (ARVY's guidance)
+    updateSystemFeedback();
     
     console.log('[ARVYAM] Phase 2 frontend initialized successfully');
   } catch (error) {
@@ -296,6 +305,12 @@ function cacheDOMElements() {
   resultsContainer = document.getElementById('curated-results');
   loadingIndicator = document.getElementById('loading-indicator');
   
+  // PHASE 13B.HF: System feedback elements
+  curateButton = document.getElementById('curate-button');
+  systemFeedbackEl = document.getElementById('system-feedback');
+  langNudgeEl = document.getElementById('lang-nudge');
+  budgetHintEl = document.getElementById('budget-hint');
+  
   if (!searchForm) console.warn('[ARVYAM] Search form not found');
   if (!searchInput) console.warn('[ARVYAM] Search input not found');
   if (!resultsContainer) console.warn('[ARVYAM] Results container not found');
@@ -335,6 +350,10 @@ function initializeMeaningInput() {
 /**
  * PHASE 13B.2: Initialize Hindi auto-detection
  */
+/**
+ * PHASE 13B.2: Initialize Hindi auto-detection
+ * PHASE 13B.HF: Updated to use hidden attribute for system-feedback integration
+ */
 function initializeHindiAutoDetect() {
   const textarea = document.getElementById('feelings-input');
   const nudgeEl = document.getElementById('lang-nudge');
@@ -358,17 +377,17 @@ function initializeHindiAutoDetect() {
     const text = textarea.value || '';
     
     if (nudgeDismissed || text.length < 3) {
-      nudgeEl.style.display = 'none';
+      nudgeEl.hidden = true;
       return;
     }
     
     const detection = detectLanguageFromText(text);
     
     if (detection.suggestedLang === 'hi' && currentLanguage === 'en' && !detection.isAmbiguous) {
-      nudgeEl.style.display = 'block';
+      nudgeEl.hidden = false;
       console.log('[ARVYAM] Hindi detected, showing language nudge');
     } else {
-      nudgeEl.style.display = 'none';
+      nudgeEl.hidden = true;
     }
   }
   
@@ -389,13 +408,13 @@ function initializeHindiAutoDetect() {
     });
     document.dispatchEvent(event);
     
-    nudgeEl.style.display = 'none';
+    nudgeEl.hidden = true;
     console.log('[ARVYAM] Language switched to Hindi via auto-detect nudge');
   });
   
   closeBtn.addEventListener('click', () => {
     nudgeDismissed = true;
-    nudgeEl.style.display = 'none';
+    nudgeEl.hidden = true;
     console.log('[ARVYAM] Hindi nudge dismissed');
   });
   
@@ -405,19 +424,33 @@ function initializeHindiAutoDetect() {
 /**
  * PHASE 13B.1: Switch to search mode
  */
+/**
+ * PHASE 13B.1: Switch to search mode
+ * PHASE 13B.HF: Update button text and system feedback
+ */
 function switchToSearchMode() {
   const textarea = document.getElementById('feelings-input');
   if (!textarea) return;
   
   currentMode = 'search';
-  textarea.placeholder = 'Share what is in your heart...';
+  textarea.placeholder = 'Share what\'s in your heart...';
   textarea.setAttribute('aria-label', 'Describe how you feel or what you are celebrating');
+  
+  // PHASE 13B.HF: Update button label
+  if (curateButton) {
+    curateButton.textContent = 'Curate';
+    curateButton.setAttribute('aria-label', 'Curate arrangements');
+  }
+  
+  // PHASE 13B.HF: Update ARVY's guidance
+  updateSystemFeedback();
   
   console.log('[ARVYAM] Switched to search mode');
 }
 
 /**
  * PHASE 13B.1: Switch to adjust mode
+ * PHASE 13B.HF: Update button text and system feedback
  */
 function switchToAdjustMode() {
   const textarea = document.getElementById('feelings-input');
@@ -427,9 +460,51 @@ function switchToAdjustMode() {
   textarea.placeholder = 'Want to adjust? Describe what to change...';
   textarea.setAttribute('aria-label', 'Adjust your current selections');
   
+  // PHASE 13B.HF: Update button label to "Refine"
+  if (curateButton) {
+    curateButton.textContent = 'Refine';
+    curateButton.setAttribute('aria-label', 'Refine these arrangements');
+  }
+  
+  // PHASE 13B.HF: Update ARVY's guidance
+  updateSystemFeedback();
+  
   announce('Adjust mode. You can now refine your selections in the same search field.');
   
   console.log('[ARVYAM] Switched to adjust mode');
+}
+
+/**
+ * PHASE 13B.HF: Update system feedback region
+ * Manages ARVY's persistent guidance line based on current mode and results state
+ */
+function updateSystemFeedback() {
+  if (!systemFeedbackEl) return;
+  
+  // Determine ARVY's base guidance line
+  let baseLine = '';
+  
+  if (!currentCardData) {
+    // No results yet - initial search state
+    baseLine = 'Share what is on your mind. You can start with a simple thought or occasion.';
+  } else if (currentMode === 'adjust') {
+    // Results displayed, in adjust mode
+    baseLine = 'You can refine these arrangements without starting over. Describe what you would like to change.';
+  } else {
+    // Search mode with results (shouldn't normally happen, but safe fallback)
+    baseLine = 'Tell ARVY what you have in mind and we will curate three options for you.';
+  }
+  
+  // Create or update the base guidance element
+  let baseEl = systemFeedbackEl.querySelector('.system-feedback__base');
+  if (!baseEl) {
+    baseEl = document.createElement('div');
+    baseEl.className = 'system-feedback__base';
+    systemFeedbackEl.prepend(baseEl);
+  }
+  baseEl.textContent = baseLine;
+  
+  console.log('[ARVYAM] System feedback updated:', currentMode, currentCardData ? 'with cards' : 'no cards');
 }
 
 /**
@@ -459,36 +534,33 @@ function detectBudgetMention(prompt) {
 /**
  * PHASE 13B.7: Show tier hint
  */
+/**
+ * PHASE 13B.7: Show tier hint
+ * PHASE 13B.HF: Updated to use unified system-feedback region
+ */
 function showBudgetHint(amount) {
+  if (!budgetHintEl) return;
+  
   const tier = amount < 2000 ? 'Classic' : amount < 3500 ? 'Signature' : 'Luxury';
   const startingPrice = tier === 'Classic' ? '1,599' : tier === 'Signature' ? '2,499' : '4,599';
   
-  const hintContainer = document.getElementById('budget-hint-container');
-  if (!hintContainer) return;
+  const message = `Based on your budget: Our ${tier} tier arrangements start at ₹${startingPrice}.`;
   
-  const hint = document.createElement('div');
-  hint.className = 'budget-hint';
-  hint.setAttribute('role', 'status');
-  hint.setAttribute('aria-live', 'polite');
-  hint.innerHTML = `
-    <p>Based on your budget: Our <strong>${tier}</strong> tier arrangements 
-       start at ₹${startingPrice}.</p>
-  `;
-  
-  hintContainer.innerHTML = '';
-  hintContainer.appendChild(hint);
+  budgetHintEl.textContent = message;
+  budgetHintEl.hidden = false;
   
   console.log(`[ARVYAM] Budget hint shown: ${tier} tier`);
 }
 
 /**
  * PHASE 13B.7: Clear budget hint
+ * PHASE 13B.HF: Updated to use unified system-feedback region
  */
 function clearBudgetHint() {
-  const hintContainer = document.getElementById('budget-hint-container');
-  if (hintContainer) {
-    hintContainer.innerHTML = '';
-  }
+  if (!budgetHintEl) return;
+  
+  budgetHintEl.hidden = true;
+  budgetHintEl.textContent = '';
 }
 
 // ============================================================================
