@@ -42,112 +42,117 @@
 }
 
 /* ========================================================================
-   Button System (A4: Unified CTA Styles)
+   UNIFIED BUTTON SYSTEM (Phase 13A.3)
+   Based on elite e-commerce best practices
    ======================================================================== */
 
 /**
  * Unified button system for all CTAs across the site
- * Variants: primary, secondary, ghost
- * Sizes: lg (hero), md (general), sm (minor)
+ * Variants: primary (revenue), secondary (navigation), tertiary (ghost)
+ * Constitutional: WCAG 2.1 AA compliant (44px touch targets, accessible focus states)
  */
 
-/* Base button styles */
+/* Base button - shared properties */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: 56px;
   min-height: 44px; /* WCAG touch target minimum */
-  padding: 0.75rem 1.5rem;  /* Step 11 Polish: Match Buy button padding (more breathing room) */
-  border-radius: 0.5rem;  /* Step 11 Polish: Match Buy button radius (more modern) */
+  padding: 0 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   font-family: "Lora", Georgia, serif;
   font-weight: 600;
-  line-height: 1;
-  text-decoration: none;
+  font-size: 17px;
   cursor: pointer;
-  border: 0;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;  /* Step 11 Polish: Optimized like Buy button */
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  line-height: 1;
   white-space: nowrap;
 }
 
-/* Focus state (WCAG 2.1 AA) */
-.btn:focus-visible {
-  outline: 2px solid var(--cta-focus-ring, #10b981);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
-}
-
-/* Variants */
+/* PRIMARY - Revenue/critical actions (forest green) */
 .btn--primary {
-  background: var(--cta-bg, #059669);
-  color: var(--cta-text, #ffffff);
+  background: #0F766E;
+  color: #FFFFFF;
+  border-color: #0F766E;
 }
 
 .btn--primary:hover {
-  background: var(--cta-bg-hover, #047857);
+  background: #0D6860;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
 }
 
 .btn--primary:active {
-  background: var(--cta-bg-active, #065f46);
   transform: translateY(1px);
+  background: #0A5850;
 }
 
+/* SECONDARY - Navigation actions (beige) */
 .btn--secondary {
-  background: #f9fafb;  /* Step 11 Polish: Grey on all devices (better aesthetics) */
-  color: #111827;
-  border: 1px solid #d1d5db;
+  background: #E6B17E;
+  color: #1E1E1E;
+  border-color: #E6B17E;
 }
 
 .btn--secondary:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: #D9A06B;
+  box-shadow: 0 4px 12px rgba(230, 177, 126, 0.3);
 }
 
 .btn--secondary:active {
-  background: #e5e7eb;
   transform: translateY(1px);
+  background: #CC8F58;
 }
 
-.btn--ghost {
-  background: #f3f4f6;  /* Step 11 Polish: Light grey on all devices (better aesthetics) */
-  border: 1px solid #d1d5db;
-  color: #111827;
+/* TERTIARY - Ghost/outline (white) */
+.btn--tertiary {
+  background: #FFFFFF;
+  color: #2B2B2B;
+  border-color: rgba(43, 43, 43, 0.15);
 }
 
-.btn--ghost:hover {
-  background: #e5e7eb;
-  border-color: #9ca3af;
+.btn--tertiary:hover {
+  border-color: rgba(43, 43, 43, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.btn--ghost:active {
-  background: #d1d5db;
+.btn--tertiary:active {
   transform: translateY(1px);
+  background: #F5F5F5;
 }
 
-/* Sizes */
-.btn--lg {
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  min-height: 48px;
-}
-
-.btn--md {
-  padding: 0.75rem 1.25rem;
-  font-size: 0.9375rem;
-  min-height: 44px;
-}
-
-.btn--sm {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  min-height: 36px;
+/* Focus state (all variants) - WCAG 2.1 AA */
+.btn:focus-visible {
+  outline: 2px solid rgba(43, 43, 43, 0.75);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(230, 177, 126, 0.28);
 }
 
 /* Disabled state */
 .btn:disabled,
 .btn.disabled {
-  opacity: 0.5;
+  background: #D1D5DB;
+  color: #9CA3AF;
   cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
   pointer-events: none;
+}
+
+/* Sizes (optional, for specific use cases) */
+.btn--lg {
+  padding: 0 32px;
+  font-size: 18px;
+  min-height: 56px;
+}
+
+.btn--sm {
+  padding: 0 16px;
+  font-size: 15px;
+  min-height: 44px;
 }
 
 /* Reduce motion support */
@@ -291,50 +296,15 @@
 }
 
 /* ========================================
-   CTA Button
+   CTA Button (Layout Only - Core Styling from .btn)
    ======================================== */
 
 .result-card__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 0.75rem 1.5rem;
-  margin-top: auto;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--cta-text);
-  background: var(--cta-bg);
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-  text-align: center;
+  /* Layout adjustments only - core button styling from .btn + .btn--primary */
+  margin-top: 1.25rem;
   width: 100%;
 }
 
-.result-card__cta:hover {
-  background: var(--cta-bg-hover);
-}
-
-.result-card__cta:active {
-  background: var(--cta-bg-active);
-  transform: translateY(1px);
-}
-
-.result-card__cta:focus {
-  outline: 2px solid var(--cta-focus-ring);
-  outline-offset: 2px;
-}
-
-.result-card__cta:focus:not(:focus-visible) {
-  outline: none;
-}
-
-.result-card__cta:focus-visible {
-  outline: 2px solid var(--cta-focus-ring);
-  outline-offset: 2px;
-}
 
 /* ========================================
    Responsive Layouts
