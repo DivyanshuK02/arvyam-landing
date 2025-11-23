@@ -12,7 +12,7 @@
  * @version 1.10.0 - A5-A6: Language propagation fix + consent toast + price rendering
  */
 
-import { detectLanguage, setLanguage } from './i18n/lang_detect.js';
+import { detectLanguageFromText, detectLanguage, setLanguage } from './i18n/lang_detect.js';
 import { t, preloadStringbanks } from './i18n/strings.js';
 import { initAccessibility, announce } from './a11y.js';
 import ConsentBanner from './components/consent_banner.js';
@@ -34,12 +34,23 @@ import PolicyFooter from './components/policy_footer.js';
  */
 const API_BASE = window.ARVYAM_API_BASE || 'https://arvyam-api.onrender.com';
 
+/**
+ * PHASE 13B.5: Feature Flags for Instant Rollback
+ * Toggle unifiedRefine to switch between new (unified) and old (RefineBar) UX
+ */
+const FEATURE_FLAGS = {
+  unifiedRefine: true  // true = unified mode, false = old RefineBar below results
+};
+
 // ============================================================================
 // Global State
 // ============================================================================
 
 let currentLanguage = 'en';
 let prevLanguage = 'en'; // Track previous language for language_changed events
+
+// PHASE 13B.1: Search mode state
+let currentMode = 'search'; // 'search' or 'adjust'
 let consentBanner = null;
 let intentAssist = null;
 let hintForm = null;
@@ -119,6 +130,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       initializeSearch();
     }
     
+    // PHASE 13B.6: Initialize meaning input (textarea auto-resize)
+    initializeMeaningInput();
+    
+    // PHASE 13B.2: Initialize Hindi auto-detection
+    initializeHindiAutoDetect();
+    
     console.log('[ARVYAM] Phase 2 frontend initialized successfully');
   } catch (error) {
     console.error('[ARVYAM] Initialization error:', error);
@@ -154,7 +171,7 @@ async function initializeConsentBanner() {
     }
   });
   
-  // Show banner only if consent hasn't been given
+  // Show banner only if consent has not been given
   if (!consentBanner.hasConsent()) {
     await consentBanner.show();
   } else {
@@ -214,13 +231,21 @@ function initializeHintForm() {
  * Allows users to gently adjust their 3 curated arrangements
  * Shown only after successful results display
  */
+/**
+ * Initialize RefineBar component (deprecated when unified refine is ON)
+ * PHASE 13B.5: Feature flag controls whether to use unified or legacy refine
+ */
 function initializeRefineBar() {
-  refineBar = new RefineBar({
-    lang: currentLanguage,
-    onSubmit: handleRefineSubmit
-  });
-  
-  console.log('[ARVYAM] RefineBar initialized');
+  if (!FEATURE_FLAGS.unifiedRefine) {
+    refineBar = new RefineBar({
+      lang: currentLanguage,
+      onSubmit: handleRefineSubmit
+    });
+    console.log('[ARVYAM] RefineBar initialized (legacy mode)');
+  } else {
+    refineBar = null;
+    console.log('[ARVYAM] RefineBar deprecated - using unified refine mode');
+  }
 }
 
 /**
@@ -274,6 +299,196 @@ function cacheDOMElements() {
   if (!searchForm) console.warn('[ARVYAM] Search form not found');
   if (!searchInput) console.warn('[ARVYAM] Search input not found');
   if (!resultsContainer) console.warn('[ARVYAM] Results container not found');
+}
+
+/**
+ * PHASE 13B.6: Initialize meaning input (textarea auto-resize)
+ */
+function initializeMeaningInput() {
+  const textarea = document.getElementById('feelings-input');
+  
+  if (!textarea || textarea.tagName !== 'TEXTAREA') {
+    console.warn('[ARVYAM] Meaning input not found or not textarea');
+    return;
+  }
+  
+  function handleResize() {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+    
+    const maxHeight = 200;
+    if (textarea.scrollHeight > maxHeight) {
+      textarea.style.height = maxHeight + 'px';
+      textarea.style.overflowY = 'auto';
+    } else {
+      textarea.style.overflowY = 'hidden';
+    }
+  }
+  
+  textarea.addEventListener('input', handleResize);
+  textarea.addEventListener('paste', () => setTimeout(handleResize, 0));
+  handleResize();
+  
+  console.log('[ARVYAM] Meaning input initialized with auto-resize');
+}
+
+/**
+ * PHASE 13B.2: Initialize Hindi auto-detection
+ */
+function initializeHindiAutoDetect() {
+  const textarea = document.getElementById('feelings-input');
+  const nudgeEl = document.getElementById('lang-nudge');
+  const switchBtn = document.getElementById('lang-nudge-switch');
+  const closeBtn = document.getElementById('lang-nudge-close');
+  
+  if (!textarea || !nudgeEl || !switchBtn || !closeBtn) {
+    console.warn('[ARVYAM] Hindi auto-detect elements not found');
+    return;
+  }
+  
+  let nudgeDismissed = false;
+  const hasManualChoice = localStorage.getItem('manual_lang') === 'true';
+  
+  if (hasManualChoice) {
+    console.log('[ARVYAM] Manual language choice detected - auto-detect disabled');
+    return;
+  }
+  
+  function analyzeText() {
+    const text = textarea.value || '';
+    
+    if (nudgeDismissed || text.length < 3) {
+      nudgeEl.style.display = 'none';
+      return;
+    }
+    
+    const detection = detectLanguageFromText(text);
+    
+    if (detection.suggestedLang === 'hi' && currentLanguage === 'en' && !detection.isAmbiguous) {
+      nudgeEl.style.display = 'block';
+      console.log('[ARVYAM] Hindi detected, showing language nudge');
+    } else {
+      nudgeEl.style.display = 'none';
+    }
+  }
+  
+  let debounceTimer;
+  textarea.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(analyzeText, 300);
+  });
+  
+  switchBtn.addEventListener('click', () => {
+    localStorage.setItem('manual_lang', 'true');
+    localStorage.setItem('arvyam_lang', 'hi');
+    document.documentElement.lang = 'hi';
+    
+    const event = new CustomEvent('arvy:language', {
+      detail: { lang: 'hi', from: 'en', trigger: 'auto_detect_nudge' },
+      bubbles: true
+    });
+    document.dispatchEvent(event);
+    
+    nudgeEl.style.display = 'none';
+    console.log('[ARVYAM] Language switched to Hindi via auto-detect nudge');
+  });
+  
+  closeBtn.addEventListener('click', () => {
+    nudgeDismissed = true;
+    nudgeEl.style.display = 'none';
+    console.log('[ARVYAM] Hindi nudge dismissed');
+  });
+  
+  console.log('[ARVYAM] Hindi auto-detect initialized');
+}
+
+/**
+ * PHASE 13B.1: Switch to search mode
+ */
+function switchToSearchMode() {
+  const textarea = document.getElementById('feelings-input');
+  if (!textarea) return;
+  
+  currentMode = 'search';
+  textarea.placeholder = 'Share what is in your heart...';
+  textarea.setAttribute('aria-label', 'Describe how you feel or what you are celebrating');
+  
+  console.log('[ARVYAM] Switched to search mode');
+}
+
+/**
+ * PHASE 13B.1: Switch to adjust mode
+ */
+function switchToAdjustMode() {
+  const textarea = document.getElementById('feelings-input');
+  if (!textarea) return;
+  
+  currentMode = 'adjust';
+  textarea.placeholder = 'Want to adjust? Describe what to change...';
+  textarea.setAttribute('aria-label', 'Adjust your current selections');
+  
+  announce('Adjust mode. You can now refine your selections in the same search field.');
+  
+  console.log('[ARVYAM] Switched to adjust mode');
+}
+
+/**
+ * PHASE 13B.7: Detect budget mentions
+ */
+function detectBudgetMention(prompt) {
+  const budgetPatterns = [
+    /\b(\d{1,2}[,.]?\d{0,3})\s*(rupees?|rs\.?|₹|inr)\b/i,
+    /\bbudget\s+of\s+(\d+)/i,
+    /\bunder\s+(\d+)/i,
+    /\baround\s+(\d+)/i,
+    /\babout\s+(\d+)/i
+  ];
+  
+  for (const pattern of budgetPatterns) {
+    const match = prompt.match(pattern);
+    if (match) {
+      const amount = parseInt(match[1].replace(/,/g, ''));
+      if (amount > 0) {
+        return { mentioned: true, amount };
+      }
+    }
+  }
+  return { mentioned: false };
+}
+
+/**
+ * PHASE 13B.7: Show tier hint
+ */
+function showBudgetHint(amount) {
+  const tier = amount < 2000 ? 'Classic' : amount < 3500 ? 'Signature' : 'Luxury';
+  const startingPrice = tier === 'Classic' ? '1,599' : tier === 'Signature' ? '2,499' : '4,599';
+  
+  const hintContainer = document.getElementById('budget-hint-container');
+  if (!hintContainer) return;
+  
+  const hint = document.createElement('div');
+  hint.className = 'budget-hint';
+  hint.setAttribute('role', 'status');
+  hint.setAttribute('aria-live', 'polite');
+  hint.innerHTML = `
+    <p>Based on your budget: Our <strong>${tier}</strong> tier arrangements 
+       start at ₹${startingPrice}.</p>
+  `;
+  
+  hintContainer.innerHTML = '';
+  hintContainer.appendChild(hint);
+  
+  console.log(`[ARVYAM] Budget hint shown: ${tier} tier`);
+}
+
+/**
+ * PHASE 13B.7: Clear budget hint
+ */
+function clearBudgetHint() {
+  const hintContainer = document.getElementById('budget-hint-container');
+  if (hintContainer) {
+    hintContainer.innerHTML = '';
+  }
 }
 
 // ============================================================================
@@ -665,6 +880,59 @@ function handleSearchInput(event) {
 /**
  * Handle search form submission
  */
+/**
+ * PHASE 13B.1: Handle refinement in unified mode
+ */
+async function handleUnifiedRefine(adjustmentText) {
+  if (!lastPrompt) {
+    console.warn('[ARVYAM] Cannot refine - no previous prompt');
+    showError('Please start a new search first.');
+    return;
+  }
+  
+  console.log('[ARVYAM] Refining in unified mode');
+  await showLoadingState();
+  uxTurns++;
+  
+  try {
+    const combinedPrompt = `${lastPrompt} (adjust: ${adjustmentText})`;
+    
+    const response = await fetch(`${API_BASE}/api/curate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: combinedPrompt,
+        language: currentLanguage,
+        hints: lastHints || undefined
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('We could not adjust the selection. Please try again.');
+    }
+    
+    const rawData = await response.json();
+    const normalized = normalizeCurateResponse(rawData);
+    
+    if (!normalized) {
+      throw new Error('We could not adjust the selection. Please try again.');
+    }
+    
+    displayResults(normalized);
+    
+    trackEvent('refine_submitted_unified', {
+      adjustment_length_chars: adjustmentText.length,
+      turn_number: uxTurns,
+      had_hints: !!lastHints
+    });
+    
+  } catch (error) {
+    console.error('[ARVYAM] Unified refinement error:', error);
+    showError('We could not adjust the selection right now. Please try again.');
+    trackEvent('refine_error_unified', { ux_turns: uxTurns });
+  }
+}
+
 async function handleSearchSubmit(event) {
   event.preventDefault();
   
@@ -680,6 +948,20 @@ async function handleSearchSubmit(event) {
   if (query.length > 240) {
     showFieldError('Please keep it under 240 characters.');
     searchInput.focus();
+    return;
+  }
+  
+  // PHASE 13B.7: Detect budget mentions and show hint
+  const budgetDetection = detectBudgetMention(query);
+  if (budgetDetection.mentioned) {
+    showBudgetHint(budgetDetection.amount);
+  } else {
+    clearBudgetHint();
+  }
+  
+  // PHASE 13B.1: Check if in adjust mode (unified refine)
+  if (FEATURE_FLAGS.unifiedRefine && currentMode === 'adjust') {
+    await handleUnifiedRefine(query);
     return;
   }
   
@@ -730,7 +1012,7 @@ async function handleSearchSubmit(event) {
     
     // CONSTITUTIONAL: Frontend is final guard on persona
     // Never surface raw error.message (could be browser technical text like "Failed to fetch")
-    showError('We couldn\'t complete your search. Please try again.');
+    showError('We could not complete your search. Please try again.');
   }
 }
 
@@ -963,7 +1245,7 @@ async function searchWithHints(prompt, hints) {
     console.error('[ARVYAM] Search with hints error:', error);
     
     // ARVY persona error message
-    showError('We couldn\'t complete your search. Please try again.');
+    showError('We could not complete your search. Please try again.');
     
     trackEvent('search_error', {
       error_type: 'with_hints',
@@ -1040,7 +1322,7 @@ async function handleRefineSubmit(refinementText) {
         console.warn('[ARVYAM] API error:', devMessage);
       }
       
-      throw new Error('We couldn\'t adjust the selection. Please try again.');
+      throw new Error('We could not adjust the selection. Please try again.');
     }
     
     const data = await response.json();
@@ -1048,7 +1330,7 @@ async function handleRefineSubmit(refinementText) {
     // Validate response
     if (!data.arrangements || !Array.isArray(data.arrangements)) {
       console.error('[ARVYAM] Invalid curate response shape:', data);
-      throw new Error('We couldn\'t adjust the selection. Please try again.');
+      throw new Error('We could not adjust the selection. Please try again.');
     }
     
     // Display results (includes triad guard + RefineBar re-attachment)
@@ -1065,7 +1347,7 @@ async function handleRefineSubmit(refinementText) {
     console.error('[ARVYAM] Refinement error:', error);
     
     // ARVY persona error message
-    showError('We couldn\'t adjust the selection right now. Please try again.');
+    showError('We could not adjust the selection right now. Please try again.');
     
     trackEvent('refine_error', {
       ux_turns: uxTurns
@@ -1088,10 +1370,49 @@ async function displayResults(data) {
   // Clear container
   resultsContainer.innerHTML = '';
   
+  // PHASE 13B.3: Show skeleton loaders immediately
+  const skeletonGrid = document.createElement('div');
+  skeletonGrid.className = 'results-grid skeleton-grid';
+  skeletonGrid.setAttribute('aria-busy', 'true');
+  skeletonGrid.style.cssText = `
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  `;
+  
+  for (let i = 0; i < 3; i++) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'skeleton-card';
+    skeleton.innerHTML = `
+      <div class="skeleton__image"></div>
+      <div class="skeleton__content">
+        <div class="skeleton__text skeleton__text--title"></div>
+        <div class="skeleton__text skeleton__text--subtitle"></div>
+        <div class="skeleton__text skeleton__text--line"></div>
+        <div class="skeleton__text skeleton__text--line"></div>
+        <div class="skeleton__text skeleton__text--button"></div>
+      </div>
+    `;
+    skeletonGrid.appendChild(skeleton);
+  }
+  
+  resultsContainer.appendChild(skeletonGrid);
+  announce('Loading arrangements...');
+  
+  // PHASE 13B.3: Wait 800ms minimum (industry standard timing)
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Clear skeleton and rebuild with real content
+  resultsContainer.innerHTML = '';
+  
   // CONSTITUTIONAL: Get exactly 3 arrangements (2 MIX + 1 MONO triad)
   const arrangements = data.arrangements.slice(0, 3);
   
-  // If backend didn't return at least 3 arrangements, this is a triad violation
+  // Store original prompt if available
+  lastPrompt = data.original_prompt || lastPrompt;
+  
+  // If backend did not return at least 3 arrangements, this is a triad violation
   if (arrangements.length < 3) {
     console.error(
       `[ARVYAM] Backend triad violation: expected 3 arrangements, got ${arrangements.length}`
@@ -1178,13 +1499,17 @@ async function displayResults(data) {
     ux_turns: uxTurns
   });
   
-  // Attach RefineBar after successful triad display
-  // CONSTITUTIONAL: RefineBar shown only after 3-card result
-  if (refineBar) {
-    refineBar.attach(resultsContainer, {
-      hasHints: !!lastHints,
-      uncertaintyScore: data.uncertainty_score ?? 0
-    });
+  // PHASE 13B.1: Switch to adjust mode or attach RefineBar based on feature flag
+  if (FEATURE_FLAGS.unifiedRefine) {
+    switchToAdjustMode();
+  } else {
+    // Legacy mode: Attach RefineBar after successful triad display
+    if (refineBar) {
+      refineBar.attach(resultsContainer, {
+        hasHints: !!lastHints,
+        uncertaintyScore: data.uncertainty_score ?? 0
+      });
+    }
   }
   
   // Scroll to results (smooth)
