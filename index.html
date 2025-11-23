@@ -284,13 +284,19 @@
       <div class="curate-card">
         <label for="feelings-input" class="sr-only">Your message</label>
 
-        <!-- PHASE 13B.2: Hindi auto-detect nudge -->
-        <div id="lang-nudge" class="lang-nudge" style="display:none;">
-          <p>It looks like you might prefer Hindi. Would you like to switch?</p>
-          <div class="lang-nudge-actions">
-            <button id="lang-nudge-switch" class="lang-nudge-btn lang-nudge-btn--primary">Switch to Hindi</button>
-            <button id="lang-nudge-close" class="lang-nudge-btn lang-nudge-btn--secondary">No thanks</button>
+        <!-- PHASE 13B.HF: Unified system feedback region (ARVY speaks + hints) -->
+        <div id="system-feedback" class="system-feedback" aria-live="polite">
+          <!-- Language nudge (PHASE 13B.2) -->
+          <div id="lang-nudge" class="lang-nudge" hidden>
+            <p>It looks like you might prefer Hindi. Would you like to switch?</p>
+            <div class="lang-nudge-actions">
+              <button id="lang-nudge-switch" class="lang-nudge-btn lang-nudge-btn--primary">Switch to Hindi</button>
+              <button id="lang-nudge-close" class="lang-nudge-btn lang-nudge-btn--secondary">No thanks</button>
+            </div>
           </div>
+          
+          <!-- Budget hint (PHASE 13B.7) -->
+          <div id="budget-hint" class="budget-hint" hidden></div>
         </div>
 
         <form id="curate-form" class="form-grid">
@@ -299,16 +305,13 @@
                  placeholder="Share what's in your heart..."
                  aria-describedby="field-error hint"
                  maxlength="240" rows="1" data-auto-resize="true" required></textarea>
-          <button type="submit" class="btn btn--secondary" aria-label="Curate suggestions">Curate</button>
+          <button id="curate-button" type="submit" class="btn btn--secondary" aria-label="Curate suggestions">Curate</button>
         </form>
 
         <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
 
         <div id="hint" class="hint">Examples: "A quiet thank you for my mentor." · "Celebrating five years together." · "She's had a tough week."</div>
       </div>
-
-      <!-- PHASE 13B.7: Budget hint container -->
-      <div id="budget-hint-container"></div>
 
       <div id="curated-results" class="grid"></div>
     </section>
