@@ -425,15 +425,15 @@ function initializeHindiAutoDetect() {
  * PHASE 13B.1: Switch to search mode
  */
 /**
- * PHASE 13B.1: Switch to search mode
- * PHASE 13B.HF: Update button text and system feedback
+ * PHASE 13B.1 + 13C: Switch to search mode
+ * Phase 13C: NO placeholder (removed for empty-box styling)
  */
 function switchToSearchMode() {
   const textarea = document.getElementById('feelings-input');
   if (!textarea) return;
   
   currentMode = 'search';
-  textarea.placeholder = 'Share what\'s in your heart...';
+  // Phase 13C: NO placeholder assignment (removed)
   textarea.setAttribute('aria-label', 'Describe how you feel or what you are celebrating');
   
   // PHASE 13B.HF: Update button label
@@ -449,15 +449,15 @@ function switchToSearchMode() {
 }
 
 /**
- * PHASE 13B.1: Switch to adjust mode
- * PHASE 13B.HF: Update button text and system feedback
+ * PHASE 13B.1 + 13C: Switch to adjust mode
+ * Phase 13C: NO placeholder (removed for empty-box styling)
  */
 function switchToAdjustMode() {
   const textarea = document.getElementById('feelings-input');
   if (!textarea) return;
   
   currentMode = 'adjust';
-  textarea.placeholder = 'Want to adjust? Describe what to change...';
+  // Phase 13C: NO placeholder assignment (removed)
   textarea.setAttribute('aria-label', 'Adjust your current selections');
   
   // PHASE 13B.HF: Update button label to "Refine"
@@ -475,25 +475,28 @@ function switchToAdjustMode() {
 }
 
 /**
- * PHASE 13B.HF: Update system feedback region
- * Manages ARVY's persistent guidance line based on current mode and results state
+ * PHASE 13B.HF + 13C: Update system feedback region
+ * Phase 13C: Uses stringbank keys for helper text
  */
-function updateSystemFeedback() {
+async function updateSystemFeedback() {
   if (!systemFeedbackEl) return;
   
   // Determine ARVY's base guidance line
-  let baseLine = '';
+  let helperKey = '';
   
   if (!currentCardData) {
     // No results yet - initial search state
-    baseLine = 'Share what is on your mind. You can start with a simple thought or occasion.';
+    helperKey = 'input.helper.search';
   } else if (currentMode === 'adjust') {
     // Results displayed, in adjust mode
-    baseLine = 'You can refine these arrangements without starting over. Describe what you would like to change.';
+    helperKey = 'input.helper.adjust';
   } else {
     // Search mode with results (shouldn't normally happen, but safe fallback)
-    baseLine = 'Tell ARVY what you have in mind and we will curate three options for you.';
+    helperKey = 'input.helper.search';
   }
+  
+  // Fetch helper text from stringbank
+  const helperText = await t(helperKey, currentLanguage);
   
   // Create or update the base guidance element
   let baseEl = systemFeedbackEl.querySelector('.system-feedback__base');
@@ -502,9 +505,9 @@ function updateSystemFeedback() {
     baseEl.className = 'system-feedback__base';
     systemFeedbackEl.prepend(baseEl);
   }
-  baseEl.textContent = baseLine;
+  baseEl.textContent = helperText;
   
-  console.log('[ARVYAM] System feedback updated:', currentMode, currentCardData ? 'with cards' : 'no cards');
+  console.log(`[ARVYAM] System feedback updated: ${currentMode} mode`);
 }
 
 /**
@@ -795,7 +798,26 @@ async function updateStaticUIText(lang) {
     if (heroTitleEl) heroTitleEl.textContent = await t('hero.title', lang);
     if (heroSubtitleEl) heroSubtitleEl.textContent = await t('hero.subtitle', lang);
     
-    // Update search input placeholder
+    // Phase 13C: Hero tagline
+    const heroTaglineEl = document.getElementById('hero-tagline');
+    if (heroTaglineEl) heroTaglineEl.textContent = await t('hero.tagline', lang);
+    
+    // Phase 13C: How It Works section
+    const howShareTitle = document.getElementById('how-share-title');
+    const howShareBody = document.getElementById('how-share-body');
+    const howInterpretTitle = document.getElementById('how-interpret-title');
+    const howInterpretBody = document.getElementById('how-interpret-body');
+    const howReceiveTitle = document.getElementById('how-receive-title');
+    const howReceiveBody = document.getElementById('how-receive-body');
+    
+    if (howShareTitle) howShareTitle.textContent = await t('howitworks.share.title', lang);
+    if (howShareBody) howShareBody.textContent = await t('howitworks.share.body', lang);
+    if (howInterpretTitle) howInterpretTitle.textContent = await t('howitworks.interpret.title', lang);
+    if (howInterpretBody) howInterpretBody.textContent = await t('howitworks.interpret.body', lang);
+    if (howReceiveTitle) howReceiveTitle.textContent = await t('howitworks.receive.title', lang);
+    if (howReceiveBody) howReceiveBody.textContent = await t('howitworks.receive.body', lang);
+    
+    // Update search input placeholder (Phase 13C: Will be empty string)
     if (searchInput) {
       const placeholder = await t('search.placeholder', lang);
       searchInput.placeholder = placeholder;
