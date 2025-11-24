@@ -313,7 +313,7 @@ export default class ConsentBanner {
     const explanation = document.createElement('p');
     explanation.id = 'consent-explanation';
     explanation.className = 'consent-explanation';
-    explanation.textContent = await t('consent.explanation', this.currentLanguage);
+    explanation.textContent = await t('consent.body', this.currentLanguage);
 
     // Checkbox group (initially hidden in simple mode)
     const checkboxGroup = await this.createCheckboxGroup();
@@ -341,7 +341,7 @@ export default class ConsentBanner {
     // Fetch all translations
     const [title, msg, acceptText, rejectText, customizeText] = await Promise.all([
       t('consent.title', this.currentLanguage),
-      t('consent.explanation', this.currentLanguage),
+      t('consent.body', this.currentLanguage),
       t('consent.acceptAll', this.currentLanguage),
       t('consent.rejectNonEssential', this.currentLanguage),
       t('consent.customize', this.currentLanguage),
