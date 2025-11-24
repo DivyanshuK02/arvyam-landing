@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ARVYAM – AI-Curated Floral Experiences</title>
-  <meta name="description" content="Tell us how you feel. Arvyam's AI curates three exquisite, occasion-ready floral experiences." />
+  <meta name="description" content="Every feeling deserves its perfect expression. ARVY presents three arrangements crafted with care." />
   <link rel="icon" type="image/png" href="assets/hero-poster.jpg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,6 +18,7 @@
     :root{
       --bg:#FCF6EE; --ink:#2B2B2B; --muted:#6F6A62; --panel:#FFFFFF;
       --accent:#E6B17E; --accent-ink:#1e1e1e;
+      --accent-tech:#C4B5FD; /* Phase 13C: Soft purple for focus ring */
       --shadow:0 12px 30px rgba(0,0,0,.06);
 
       --radius:16px; --radius-photo:20px; --radius-ctl:14px;
@@ -26,6 +27,11 @@
       --h1:clamp(38px,5.2vw,60px);
       --h2:clamp(28px,3.4vw,38px);
       --section-pad:96px; --header-offset:96px;
+      
+      /* Phase 13C: Input field states */
+      --field-border: rgba(0, 0, 0, 0.06);
+      --field-border-hover: rgba(0, 0, 0, 0.12);
+      --field-focus-ring: var(--accent-tech);
     }
 
     /* Reset & base */
@@ -36,12 +42,13 @@
     a{color:inherit;text-decoration:none}
     button,input{font:inherit}
 
-    /* Headlines (Playfair) */
+    /* Headlines (Playfair) - Phase 13C: Enforce normal font-style */
     h1,h2,h3,h4,.wordmark,.ghost,.curate-label{
       font-family:"Playfair Display",Georgia,serif;
       font-weight:500;
       letter-spacing:-0.012em;
       margin:0; color:var(--ink);
+      font-style: normal; /* Phase 13C: No italics on headings */
     }
     h1{font-size:var(--h1); line-height:1.15}
     h2{font-size:var(--h2); text-align:center; line-height:1.2}
@@ -56,6 +63,23 @@
       color:var(--ink);
     }
     .muted{color:var(--muted)}
+    
+    /* Phase 13C: Italics rules - selective application */
+    .hero-tagline,
+    .examples-text,
+    #hint {
+      font-style: italic;
+    }
+    
+    /* Phase 13C: Enforce normal font-style on buttons, CTAs, prices */
+    .btn,
+    .buy-btn,
+    .price,
+    .card-title,
+    .tier-label,
+    .ghost {
+      font-style: normal;
+    }
 
     /* Layout */
     .container{max-width:var(--container); margin:0 auto; padding:0 16px}
@@ -88,6 +112,14 @@
 
     /* Lead text */
     .lead{font-size:18px; line-height:1.6; max-width:640px; font-weight:400}
+    
+    /* Phase 13C: Hero tagline styling */
+    .hero-tagline {
+      font-size: 15px;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 8px;
+    }
 
     /* Curate card */
     .curate-card{
@@ -120,7 +152,22 @@
       text-align:center;
     }
 
-    .card{background:var(--panel); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column}
+    /* Phase 13C: Card hover effect (micro-interactions) */
+    .card{
+      background:var(--panel); 
+      border-radius:16px; 
+      overflow:hidden; 
+      box-shadow:var(--shadow); 
+      display:flex; 
+      flex-direction:column;
+      transition: all 0.3s ease; /* Phase 13C: Smooth transitions */
+    }
+    
+    .card:hover {
+      transform: translateY(-4px); /* Phase 13C: Subtle lift on hover */
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12); /* Phase 13C: Enhanced shadow */
+    }
+    
     .card .media{
       aspect-ratio:4/5;
       background:transparent;
@@ -140,7 +187,9 @@
     }
     @keyframes cardFade { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
     .card{ animation: cardFade .5s ease-out forwards; opacity:0; }
-    @media (prefers-reduced-motion: reduce){ .card{ animation:none; opacity:1; } }
+    @media (prefers-reduced-motion: reduce){ 
+      .card{ animation:none; opacity:1; transition:none; } /* Phase 13C: Respect motion preferences */
+    }
     .card h4{font-weight:600; font-size:20px; margin:0 0 4px}
     .card-description{
       font-family:'Lora',serif; font-size:16px; color:var(--ink);
@@ -152,13 +201,39 @@
       display:inline-block; font-family:"Playfair Display",Georgia,serif; margin-top:10px;
     }
 
+    /* Phase 13C: Buy button gentle pulse on focus */
     .buy-btn{
       display:inline-block; margin-top:10px; padding:10px 14px; border:none; border-radius:12px;
       background:#2B2B2B; color:#FFFFFF; font-family:Lora,serif; font-size:14px; letter-spacing:.2px; cursor:pointer;
-      box-shadow:0 2px 8px rgba(0,0,0,0.06); transition:transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06); 
+      transition:transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+      position: relative;
     }
-    .buy-btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,0.10); background:#222; }
-    .buy-btn:active{ transform: translateY(0); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .buy-btn:hover{ 
+      transform: translateY(-1px); 
+      box-shadow:0 6px 14px rgba(0,0,0,0.10); 
+      background:#222; 
+    }
+    .buy-btn:active{ 
+      transform: translateY(0); 
+      box-shadow:0 2px 8px rgba(0,0,0,0.06); 
+    }
+    
+    /* Phase 13C: Gentle pulse on focus (premium detail) */
+    @keyframes gentle-pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.02); }
+    }
+    
+    .buy-btn:focus-visible::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 14px;
+      background: rgba(230, 177, 126, 0.3);
+      animation: gentle-pulse 2s ease-in-out infinite;
+      z-index: -1;
+    }
 
     .sr-only {
       position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
@@ -205,9 +280,22 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+    
+    /* Mobile responsiveness - Phase 13C: Ensure 375px viewport clean */
     @media (max-width: 480px){
       .buy-btn{ min-height:44px; }
       .card .pad{ padding:14px 14px 16px; row-gap:6px; }
+      h1 { font-size: clamp(32px, 8vw, 42px); } /* Slightly smaller on mobile */
+      .lead { font-size: 16px; }
+      .hero-tagline { font-size: 14px; }
+      .tile h3 { font-size: 20px; }
+      .tile p { font-size: 14px; }
+    }
+    
+    /* Phase 13C: Extreme mobile (375px) */
+    @media (max-width: 375px) {
+      .container { padding: 0 14px; }
+      .curate-card { padding: 28px 20px; }
     }
   </style>
   
@@ -243,13 +331,16 @@
 
   <main id="main-content">
     
+    <!-- PHASE 13C: Updated hero copy - meaning engine positioning -->
     <section class="container" style="padding-block:96px">
       <div class="row">
         <div>
-          <h1 id="hero-title">Tell us how you feel—<br>we'll curate your flowers.</h1>
+          <h1 id="hero-title">Every feeling deserves its perfect expression.</h1>
           <p id="hero-subtitle" class="lead muted" style="margin-top:20px">
-            A calm, aesthetic experience powered by AI. Share a thought or occasion; receive three exquisite options crafted to the moment.
+            Share your moment. ARVY presents three arrangements crafted with care.
           </p>
+          <!-- PHASE 13C: Hero tagline (italicized) -->
+          <p id="hero-tagline" class="hero-tagline">by ARVY – your meaning engine</p>
           <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:28px">
             <a class="btn btn--secondary" href="#curate" aria-label="Start your curated gift">Begin my journey</a>
             <a class="btn btn--tertiary" href="#how" aria-label="Learn how Arvyam works">How it works</a>
@@ -286,6 +377,7 @@
 
         <!-- PHASE 13B.HF: Unified system feedback region (ARVY speaks + hints) -->
         <div id="system-feedback" class="system-feedback" aria-live="polite">
+          <!-- ARVY's persistent helper text (populated by app.js) -->
           <!-- Language nudge (PHASE 13B.2) -->
           <div id="lang-nudge" class="lang-nudge" hidden>
             <p>It looks like you might prefer Hindi. Would you like to switch?</p>
@@ -300,9 +392,9 @@
         </div>
 
         <form id="curate-form" class="form-grid">
-          <!-- PHASE 13B.6: Textarea with auto-resize (core "meaning engine" UX) -->
+          <!-- PHASE 13B.6 + 13C: Textarea with NO placeholder (empty-box styling in CSS) -->
           <textarea id="feelings-input" class="meaning-input" name="message"
-                 placeholder="Share what's in your heart..."
+                 placeholder=""
                  aria-describedby="field-error hint"
                  maxlength="240" rows="1" data-auto-resize="true" required></textarea>
           <button id="curate-button" type="submit" class="btn btn--secondary" aria-label="Curate suggestions">Curate</button>
@@ -310,26 +402,28 @@
 
         <div id="field-error" class="hint" aria-live="polite" style="display:none"></div>
 
-        <div id="hint" class="hint">Examples: "A quiet thank you for my mentor." · "Celebrating five years together." · "She's had a tough week."</div>
+        <!-- PHASE 13C: Examples with italics -->
+        <div id="hint" class="hint examples-text">Examples: "A quiet thank you for my mentor." · "Celebrating five years together." · "She's had a tough week."</div>
       </div>
 
       <div id="curated-results" class="grid"></div>
     </section>
 
+    <!-- PHASE 13C: Updated How It Works with IDs for translation -->
     <section id="how" class="container" style="padding-block:112px; text-align:center">
       <h2>How it works</h2>
       <div class="tiles">
         <div class="tile">
-          <h3>Express yourself</h3>
-          <p>Write a thought, feeling, or occasion.</p>
+          <h3 id="how-share-title">Share</h3>
+          <p id="how-share-body">A thought, a feeling, or an occasion.</p>
         </div>
         <div class="tile">
-          <h3>AI curates</h3>
-          <p>We interpret tone & context to understand your intent.</p>
+          <h3 id="how-interpret-title">We interpret</h3>
+          <p id="how-interpret-body">ARVY reads tone, relationship, and intent to understand your moment.</p>
         </div>
         <div class="tile">
-          <h3>Your experience</h3>
-          <p>Three refined options that match the mood, beautifully presented.</p>
+          <h3 id="how-receive-title">Receive</h3>
+          <p id="how-receive-body">Three considered arrangements, beautifully presented and ready to gift.</p>
         </div>
       </div>
     </section>
