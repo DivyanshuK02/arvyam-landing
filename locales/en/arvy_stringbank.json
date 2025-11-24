@@ -58,7 +58,7 @@
     "label": "What's the occasion?",
     "placeholder": "",
     "button": "Curate for me",
-    "cta": "Search",
+    "cta": "Curate",
     "helper": "We do not store your exact words—only the curated selections we provide.",
     "error_empty": "Please describe what you are celebrating.",
     "error_length": "Please keep it under 240 characters."
