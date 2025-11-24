@@ -447,13 +447,22 @@
   }
 }
 
-/* Card */
+/* Card - Phase 13C: Premium styling to match result cards */
 .consent-card {
   position: relative;
   background: #ffffff;
-  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06), 
+              0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Phase 13C: Mobile consent card */
+@media (max-width: 480px) {
+  .consent-card {
+    padding: 1.5rem 1.25rem;
+  }
 }
 
 /* Title */
@@ -1656,7 +1665,8 @@
    ============================================================================ */
 
 /* ----------------------------------------------------------------------------
-   PHASE 13B.6: Meaning Input (Textarea with Breathing Animation)
+   PHASE 13B.6 + 13C: Meaning Input (Conversational Textarea)
+   Phase 13C: Empty-box styling with soft purple focus ring
    ---------------------------------------------------------------------------- */
 
 .meaning-input {
@@ -1668,25 +1678,37 @@
   line-height: 1.6;
   color: #2B2B2B;
   background: #FFFFFF;
-  border: 1.5px solid #E0E0E0;
+  
+  /* Phase 13C: Empty-box styling */
+  border: 1px solid var(--field-border, rgba(0, 0, 0, 0.06));
   border-radius: 8px;
   resize: none;
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
   
   /* Breathing animation (museum-grade premium detail) */
   animation: gentle-breathe 4s ease-in-out infinite;
 }
 
-.meaning-input:focus {
-  outline: none;
-  border-color: #E6B17E;
-  box-shadow: 0 0 0 3px rgba(230, 177, 126, 0.1);
+/* Phase 13C: Hover state (empty-box anxiety solution) */
+.meaning-input:hover {
+  border-color: var(--field-border-hover, rgba(0, 0, 0, 0.12));
 }
 
+/* Phase 13C: Focus state with soft purple tech accent */
+.meaning-input:focus,
+.meaning-input:focus-visible {
+  outline: none;
+  border-color: var(--field-focus-ring, #C4B5FD);
+  box-shadow: 0 0 0 1px var(--field-focus-ring, #C4B5FD), 
+              0 0 0 8px rgba(196, 181, 253, 0.25);
+}
+
+/* Phase 13C: Placeholder removed - this style kept for fallback only */
 .meaning-input::placeholder {
   color: #999;
   font-style: italic;
+  opacity: 0; /* Phase 13C: Hidden by default */
 }
 
 /* Mobile: Prevent iOS zoom on focus */
@@ -1884,5 +1906,33 @@
   .system-feedback .budget-hint {
     font-size: 0.875rem;
     padding: 0.4375rem 0.625rem;
+  }
+}
+
+/* ============================================================================
+   PHASE 13C: Mobile 375px Enhancements
+   ============================================================================ */
+
+/* Phase 13C: Extreme mobile (375px) */
+@media (max-width: 375px) {
+  .system-feedback__base {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+  
+  .meaning-input {
+    padding: 0.75rem 0.875rem;
+    font-size: 15px;
+  }
+  
+  .lang-nudge,
+  .budget-hint {
+    font-size: 0.8125rem;
+    padding: 0.625rem 0.75rem;
+  }
+  
+  .btn {
+    padding: 0 20px;
+    font-size: 16px;
   }
 }
