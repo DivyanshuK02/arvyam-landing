@@ -30,12 +30,33 @@
     "skip": "Skip for now"
   },
   "hero": {
-    "title": "Tell us how you feel—we will curate your flowers.",
-    "subtitle": "Arvyam removes the paradox of choice. Describe the moment, and our AI curates three exquisite, occasion-ready arrangements."
+    "title": "Every feeling deserves its perfect expression.",
+    "subtitle": "Share your moment. ARVY presents three arrangements crafted with care.",
+    "tagline": "by ARVY – your meaning engine"
+  },
+  "howitworks": {
+    "share": {
+      "title": "Share",
+      "body": "A thought, a feeling, or an occasion."
+    },
+    "interpret": {
+      "title": "We interpret",
+      "body": "ARVY reads tone, relationship, and intent to understand your moment."
+    },
+    "receive": {
+      "title": "Receive",
+      "body": "Three considered arrangements, beautifully presented and ready to gift."
+    }
+  },
+  "input": {
+    "helper": {
+      "search": "Share your moment – a thought, a feeling, an occasion.",
+      "adjust": "Refine these arrangements without starting over. Describe what you would like to change."
+    }
   },
   "search": {
     "label": "What's the occasion?",
-    "placeholder": "A friend's birthday, feeling grateful, celebrating new job...",
+    "placeholder": "",
     "button": "Curate for me",
     "cta": "Search",
     "helper": "We do not store your exact words—only the curated selections we provide.",
@@ -58,7 +79,7 @@
   "refine": {
     "title": "Adjust the selection",
     "helper": "",
-    "placeholder": "E.g., warmer colors • softer palette",
+    "placeholder": "",
     "button": "Refine",
     "counter": "{turn} / {max}",
     "max": "You have reached {max} refinements. These are the best-matching options we can offer today.",
@@ -67,15 +88,32 @@
     "error_phone": "Please do not include phone numbers.",
     "error_email": "Please do not include email addresses."
   },
+  "hint": {
+    "budget": {
+      "classic": "Based on your budget: our Classic tier arrangements start at ₹1,599.",
+      "signature": "Based on your budget: our Signature tier arrangements start at ₹2,499.",
+      "luxury": "Based on your budget: our Luxury tier arrangements start at ₹4,599."
+    }
+  },
+  "loading": {
+    "step1": "Understanding your moment…",
+    "step2": "Curating your arrangements with care…",
+    "step3": "Almost ready…"
+  },
+  "error": {
+    "generic": "I could not complete this request. Please try again in a moment.",
+    "need_more_detail": "I am having trouble understanding this. Could you share a little more detail?"
+  },
   "consent": {
-    "title": "Your privacy matters",
-    "description": "We use cookies to improve your experience. You can customize which cookies we use.",
-    "explanation": "We use cookies to improve your experience. You can customize which cookies we use.",
-    "acceptAll": "Accept All",
-    "rejectAll": "Reject All",
-    "rejectNonEssential": "Reject All",
+    "title": "Your privacy matters.",
+    "description": "We use cookies and similar tools to understand what works and to improve your experience. You can change these choices at any time.",
+    "body": "We use cookies and similar tools to understand what works and to improve your experience. You can change these choices at any time.",
+    "explanation": "We use cookies and similar tools to understand what works and to improve your experience. You can change these choices at any time.",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "rejectNonEssential": "Reject all",
     "save_preferences": "Save Preferences",
-    "customize": "Customize",
+    "customize": "Customise",
     "manage_preferences": "Manage Preferences",
     "functional": "Functional",
     "functionalDesc": "Required for the site to work (always on)",
@@ -97,6 +135,7 @@
   },
   "footer": {
     "copyright": "© {year} ARVYAM — quietly delightful flowers.",
+    "tagline": "Flowers that speak when words cannot.",
     "privacy": "Privacy",
     "terms": "Terms",
     "refund": "Refund",
